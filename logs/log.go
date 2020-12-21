@@ -31,6 +31,7 @@ var (
 **/
 type MyLog struct {
 	zapLog *zap.Logger
+	Level  zap.AtomicLevel
 }
 
 /**
@@ -79,19 +80,19 @@ func newCore(filePath, level string, maxSize, maxBackups, maxAge int, compress b
 		Compress:   compress,   // 是否压缩
 	}
 	// 设置日志级别
-	atomicLevel := zap.NewAtomicLevel()
+	Lg.Level = zap.NewAtomicLevel()
 	switch level {
 	case "debug":
-		atomicLevel.SetLevel(zap.DebugLevel)
+		Lg.Level.SetLevel(zap.DebugLevel)
 		break
 	case "info":
-		atomicLevel.SetLevel(zap.InfoLevel)
+		Lg.Level.SetLevel(zap.InfoLevel)
 		break
 	case "error":
-		atomicLevel.SetLevel(zap.ErrorLevel)
+		Lg.Level.SetLevel(zap.ErrorLevel)
 		break
 	default:
-		atomicLevel.SetLevel(zap.WarnLevel)
+		Lg.Level.SetLevel(zap.WarnLevel)
 		break
 	}
 	//公用编码器
@@ -111,7 +112,7 @@ func newCore(filePath, level string, maxSize, maxBackups, maxAge int, compress b
 	return zapcore.NewCore(
 		zapcore.NewJSONEncoder(encoderConfig),                                           // 编码器配置
 		zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(&hook)), // 打印到控制台和文件
-		atomicLevel,                                                                     // 日志级别
+		Lg.Level,                                                                        // 日志级别
 	)
 }
 

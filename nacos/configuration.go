@@ -7,6 +7,7 @@ package nacos
 
 import (
 	"fmt"
+	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/pojo"
 	"github.com/MassAdobe/go-gin/systemUtils"
 	"github.com/nacos-group/nacos-sdk-go/clients"
@@ -14,17 +15,19 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/clients/naming_client"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/vo"
+	"go.uber.org/zap"
 	"os"
 	"strings"
 )
 
 var (
-	serverCs     []constant.ServerConfig     // nacos的server配置
-	clientC      constant.ClientConfig       // nacos的client配置
-	profileC     vo.ConfigParam              // nacos的配置
-	configClient config_client.IConfigClient // nacos服务配置中心client
-	namingClient naming_client.INamingClient // nacos服务注册与发现client
-	NacosContent string                      // nacos配置中心配置内容
+	serverCs        []constant.ServerConfig     // nacos的server配置
+	clientC         constant.ClientConfig       // nacos的client配置
+	profileC        vo.ConfigParam              // nacos的配置
+	configClient    config_client.IConfigClient // nacos服务配置中心client
+	namingClient    naming_client.INamingClient // nacos服务注册与发现client
+	NacosContent    string                      // nacos配置中心配置内容
+	NacosRegistPojo []*interface{}              // nacos注册的自主配置结构体
 )
 
 /**
@@ -106,5 +109,52 @@ func NacosConfiguration() {
 			os.Exit(1)
 		}
 		fmt.Println(fmt.Sprintf("【SYSTEM】%s %s %s %s", systemUtils.RtnCurTime(), "【nacos配置中心】", "【nacos配置】", "获取配置成功"))
+		ListenConfiguration() // 监听配置文件变化
+	}
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2020/12/21 2:58 下午
+ * @Description: 监听配置文件变化
+**/
+func ListenConfiguration() {
+	if pojo.InitConf.NacosConfiguration {
+		err := configClient.ListenConfig(vo.ConfigParam{
+			DataId: pojo.InitConf.NacosDataId,
+			Group:  pojo.InitConf.NacosGroup,
+			OnChange: func(namespace, group, dataId, data string) {
+				logs.Lg.Info("nacos配置文件变化", logs.Desc(fmt.Sprintf("groupId: %s, dataId: %s, data: %s", group, dataId, data)))
+				// 修改日志级别
+				profile := ReadNacosProfile(data)
+				if strings.ToLower(pojo.InitConf.LogLevel) != strings.ToLower(profile.Log.Level) {
+					switch strings.ToLower(profile.Log.Level) {
+					case "debug":
+						logs.Lg.Level.SetLevel(zap.DebugLevel)
+					case "info":
+						logs.Lg.Level.SetLevel(zap.InfoLevel)
+					case "warn":
+						logs.Lg.Level.SetLevel(zap.WarnLevel)
+					case "error":
+						logs.Lg.Level.SetLevel(zap.ErrorLevel)
+					case "dpanic":
+						logs.Lg.Level.SetLevel(zap.DPanicLevel)
+					case "panic":
+						logs.Lg.Level.SetLevel(zap.PanicLevel)
+					case "fatal":
+						logs.Lg.Level.SetLevel(zap.FatalLevel)
+					}
+				}
+				// 返回宿主系统自带参数配置
+				if len(NacosRegistPojo) != 0 {
+					for _, pj := range NacosRegistPojo {
+						pj = ReadNacosSelfProfile(data, pj)
+					}
+				}
+			},
+		})
+		if err != nil {
+
+		}
 	}
 }
