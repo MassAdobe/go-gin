@@ -3,7 +3,7 @@
  * @Author : MassAdobe
  * @Description: system
 **/
-package main
+package start
 
 import (
 	"context"
