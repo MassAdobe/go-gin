@@ -7,13 +7,13 @@ package nacos
 
 import (
 	"fmt"
+	"github.com/MassAdobe/go-gin/pojo"
+	"github.com/MassAdobe/go-gin/systemUtils"
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/clients/config_client"
 	"github.com/nacos-group/nacos-sdk-go/clients/naming_client"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/vo"
-	"go-gin/pojo"
-	"go-gin/systemUtils"
 	"os"
 	"strings"
 )

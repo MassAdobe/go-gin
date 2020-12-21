@@ -7,7 +7,7 @@ package nacos
 
 import (
 	"fmt"
-	"go-gin/systemUtils"
+	"github.com/MassAdobe/go-gin/systemUtils"
 	"gopkg.in/yaml.v2"
 	"os"
 )

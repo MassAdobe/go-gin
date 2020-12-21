@@ -1,4 +1,4 @@
-module go-gin
+module github.com/MassAdobe/go-gin
 
 go 1.15
 

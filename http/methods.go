@@ -8,10 +8,10 @@ package http
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/MassAdobe/go-gin/config"
+	"github.com/MassAdobe/go-gin/errs"
+	"github.com/MassAdobe/go-gin/logs"
 	"github.com/gin-gonic/gin"
-	"go-gin/config"
-	"go-gin/errs"
-	"go-gin/logs"
 	"io/ioutil"
 	"net/http"
 	"reflect"

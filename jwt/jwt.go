@@ -11,11 +11,11 @@ package jwt
  * @Description: JWT工具类
 **/
 import (
+	"github.com/MassAdobe/go-gin/config"
+	"github.com/MassAdobe/go-gin/logs"
+	"github.com/MassAdobe/go-gin/pojo"
+	"github.com/MassAdobe/go-gin/systemUtils"
 	"github.com/dgrijalva/jwt-go"
-	"go-gin/config"
-	"go-gin/logs"
-	"go-gin/pojo"
-	"go-gin/systemUtils"
 	"strings"
 )
 

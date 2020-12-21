@@ -7,10 +7,10 @@ package db
 
 import (
 	"fmt"
+	"github.com/MassAdobe/go-gin/logs"
+	"github.com/MassAdobe/go-gin/nacos"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"go-gin/logs"
-	"go-gin/nacos"
 	"os"
 )
 

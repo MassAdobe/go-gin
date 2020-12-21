@@ -6,9 +6,9 @@
 package validated
 
 import (
+	"github.com/MassAdobe/go-gin/errs"
+	"github.com/MassAdobe/go-gin/logs"
 	"github.com/gin-gonic/gin"
-	"go-gin/errs"
-	"go-gin/logs"
 	"net/http"
 )
 

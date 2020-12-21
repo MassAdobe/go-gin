@@ -8,10 +8,10 @@ package logs
 import (
 	_ "encoding/json"
 	"fmt"
+	"github.com/MassAdobe/go-gin/config"
+	"github.com/MassAdobe/go-gin/pojo"
 	"github.com/gin-gonic/gin"
 	"github.com/natefinch/lumberjack"
-	"go-gin/config"
-	"go-gin/pojo"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"

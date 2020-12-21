@@ -7,12 +7,12 @@ package nacos
 
 import (
 	"fmt"
+	"github.com/MassAdobe/go-gin/logs"
+	"github.com/MassAdobe/go-gin/pojo"
+	"github.com/MassAdobe/go-gin/systemUtils"
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/model"
 	"github.com/nacos-group/nacos-sdk-go/vo"
-	"go-gin/logs"
-	"go-gin/pojo"
-	"go-gin/systemUtils"
 	"os"
 )
 

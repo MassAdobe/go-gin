@@ -6,8 +6,8 @@
 package errs
 
 import (
+	"github.com/MassAdobe/go-gin/logs"
 	"github.com/gin-gonic/gin"
-	"go-gin/logs"
 	"net/http"
 )
 
