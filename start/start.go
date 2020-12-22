@@ -39,11 +39,12 @@ func init() {
 	nacos.InitNacos()          // 初始化nacos配置
 	nacos.NacosConfiguration() // nacos配置中心
 	nacos.InitNacosProfile()   // 处理首次nacos获取到的配置信息
-	nacos.NacosDiscovery()     // nacos服务注册发现
 	logs.InitLogger(nacos.InitConfiguration.Log.Path,
 		nacos.InitConfiguration.Serve.ServerName,
 		nacos.InitConfiguration.Log.Level,
 		nacos.InitConfiguration.Serve.Port) // 初始化日志
+	nacos.ListenConfiguration()             // 监听配置文件变化
+	nacos.NacosDiscovery()                  // nacos服务注册发现
 	db.InitDB()                             // 初始化DB
 	validated.InitValidator()               // 初始化校验器
 }

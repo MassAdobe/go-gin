@@ -6,6 +6,7 @@
 package nacos
 
 import (
+	"errors"
 	"fmt"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/pojo"
@@ -81,8 +82,8 @@ func InitNacos() {
 			DataId: pojo.InitConf.NacosDataId,
 			Group:  pojo.InitConf.NacosGroup,
 		}
+		fmt.Println(fmt.Sprintf("【SYSTEM】%s %s %s %s", systemUtils.RtnCurTime(), "【nacos配置中心】", "【nacos配置】", "初始化配置成功"))
 	}
-	fmt.Println(fmt.Sprintf("【SYSTEM】%s %s %s %s", systemUtils.RtnCurTime(), "【nacos配置中心】", "【nacos配置】", "初始化配置成功"))
 }
 
 /**
@@ -109,7 +110,6 @@ func NacosConfiguration() {
 			os.Exit(1)
 		}
 		fmt.Println(fmt.Sprintf("【SYSTEM】%s %s %s %s", systemUtils.RtnCurTime(), "【nacos配置中心】", "【nacos配置】", "获取配置成功"))
-		ListenConfiguration() // 监听配置文件变化
 	}
 }
 
@@ -124,25 +124,34 @@ func ListenConfiguration() {
 			DataId: pojo.InitConf.NacosDataId,
 			Group:  pojo.InitConf.NacosGroup,
 			OnChange: func(namespace, group, dataId, data string) {
-				logs.Lg.Info("nacos配置文件变化", logs.Desc(fmt.Sprintf("groupId: %s, dataId: %s, data: %s", group, dataId, data)))
+				logs.Lg.Info("nacos配置文件监听", logs.Desc(fmt.Sprintf("groupId: %s, dataId: %s, data: %s", group, dataId, data)))
 				// 修改日志级别
 				profile := ReadNacosProfile(data)
 				if strings.ToLower(pojo.InitConf.LogLevel) != strings.ToLower(profile.Log.Level) {
 					switch strings.ToLower(profile.Log.Level) {
 					case "debug":
 						logs.Lg.Level.SetLevel(zap.DebugLevel)
+						printModifiedLog(profile.Log.Level)
 					case "info":
 						logs.Lg.Level.SetLevel(zap.InfoLevel)
+						printModifiedLog(profile.Log.Level)
 					case "warn":
 						logs.Lg.Level.SetLevel(zap.WarnLevel)
+						printModifiedLog(profile.Log.Level)
 					case "error":
 						logs.Lg.Level.SetLevel(zap.ErrorLevel)
+						printModifiedLog(profile.Log.Level)
 					case "dpanic":
 						logs.Lg.Level.SetLevel(zap.DPanicLevel)
+						printModifiedLog(profile.Log.Level)
 					case "panic":
 						logs.Lg.Level.SetLevel(zap.PanicLevel)
+						printModifiedLog(profile.Log.Level)
 					case "fatal":
 						logs.Lg.Level.SetLevel(zap.FatalLevel)
+						printModifiedLog(profile.Log.Level)
+					default:
+						logs.Lg.Error("动态调整日志级别", errors.New("dynamic modified log level error"), logs.Desc("动态调整日志级别失败，日志级别字符不正确"))
 					}
 				}
 				// 返回宿主系统自带参数配置
@@ -154,7 +163,21 @@ func ListenConfiguration() {
 			},
 		})
 		if err != nil {
-
+			logs.Lg.Error("nacos配置文件监听", err, logs.Desc("设置nacos配置文件监听器失败"))
+			os.Exit(1)
 		}
+		logs.Lg.Info("nacos配置文件监听", logs.Desc("设置nacos配置文件监听器成功"))
 	}
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2020/12/21 6:02 下午
+ * @Description: 输出动态修改日志级别日志，同时赋值新日志级别
+**/
+func printModifiedLog(current string) {
+	logs.Lg.Info("动态调整日志级别",
+		logs.Desc(fmt.Sprintf("动态调整日志级别成功，由级别 %s 调至 %s",
+			strings.ToLower(pojo.InitConf.LogLevel), strings.ToLower(current))))
+	pojo.InitConf.LogLevel = strings.ToLower(current)
 }
