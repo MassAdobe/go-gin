@@ -29,9 +29,6 @@ const (
 	ErrPutRequestCode                         // Put请求错误
 	ErrDeleteRequestCode                      // Deleted请求错误
 
-	//自定义错误码
-	ErrLoginCode = 10000 + iota // 登录错误
-
 	/*error desc*/
 	SuccessDesc                        = "成功"
 	ErrSystemDesc                      = "内部错误"
@@ -49,9 +46,6 @@ const (
 	ErrGetRequestDesc                  = "Get请求错误"
 	ErrPutRequestDesc                  = "Put请求错误"
 	ErrDeleteRequestDesc               = "Deleted请求错误"
-
-	//自定义错误描述
-	ErrLoginDesc = "登录错误(用户名密码错误或不存在相关用户)"
 )
 
 /**
@@ -77,6 +71,17 @@ var CodeDescMap = map[int]string{
 	ErrGetRequestCode:                  ErrGetRequestDesc,
 	ErrPutRequestCode:                  ErrPutRequestDesc,
 	ErrDeleteRequestCode:               ErrDeleteRequestDesc,
-	// 自定义错误
-	ErrLoginCode: ErrLoginDesc,
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2020/12/28 5:08 下午
+ * @Description: 适配增加宿主项目的错误代码日志
+**/
+func AddErrs(errStructs map[int]string) {
+	if 0 != len(errStructs) {
+		for k, v := range errStructs {
+			CodeDescMap[k] = v
+		}
+	}
 }

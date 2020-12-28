@@ -26,6 +26,7 @@
 >> + 基于nacos的自定义配置，动态更新（可选）；
 >> + redis连接池（可选）；
 >> + 增加了关闭系统时，释放Redis连接池与数据库连接池的句柄；
+>> + 业务报错适配器；
 
 ---
 
@@ -172,8 +173,59 @@ func init() {
 	})
 ```
 
+---
 
->#### 未做功能
+## 业务报错适配器
+### 使用方式
+```go
+package wrong
+
+import "github.com/MassAdobe/go-gin/errs"
+
+// 定义错误码和错误描述
+const (
+	//自定义错误码
+	ErrLoginCode = 1000 + iota // 登录错误
+
+	//自定义错误描述
+	ErrLoginDesc = "登录错误(用户名密码错误或不存在相关用户)"
+)
+
+// 定义错误码和错误描述的容器
+var CodeDescMap = map[int]string{
+	// 自定义错误
+	ErrLoginCode: ErrLoginDesc,
+}
+
+// 塞入脚手架中
+func init() {
+	errs.AddErrs(CodeDescMap)
+}
+```
+### 业务使用
+```go
+func SignIn(c *gin.Context) {
+	signInParam := new(params.SignInParam)
+	validated.BindAndCheck(c, signInParam)
+	logs.Lg.Debug("登录", c)
+	logs.Lg.Info("登录", c, logs.Desc("abc"))
+	if len(signInParam.UserName) == 0 {
+        panic(errs.NewError(wrong.ErrLoginCode)) // 使用panic全局报错
+    }
+	validated.SuccRes(c, &params.SignInRtn{
+		UserName:        signInParam.UserName,
+		PassWord:        signInParam.PassWord,
+		Timestamp:       signInParam.Timestamp,
+		NacosTestInt:    testNacos.NacosTestInt,
+		NacosTestBool:   testNacos.NacosTestStruct.NacosTestBool,
+		NacosTestString: testNacos.NacosTestStruct.NacosTestString,
+	})
+}
+```
+
+---
+
+>## 未做功能
 >> + 服务熔断；
 >> + 服务降级；
->> + 业务报错适配器；
+
