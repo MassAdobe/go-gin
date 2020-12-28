@@ -47,6 +47,17 @@ type InitNacosConfiguration struct {
 	Feign struct { // 内部调用配置
 		RetryNum int `yaml:"retry-num"` // 内部调用重试次数
 	} `yaml:"feign"`
+	Redis struct { // redis配置
+		MaxIdle        int    `yaml:"max-idle"`        // 最大挂起数
+		MaxActive      int    `yaml:"max-active"`      // 最大活跃数
+		IdleTimeout    int    `yaml:"idle-timeout"`    // 最大挂起时间（秒）
+		IpPort         string `yaml:"ip-port"`         // redis的IP和端口
+		PassWord       string `yaml:"password"`        // 密码口令
+		Database       int    `yaml:"database"`        // 数据库号：0-15
+		ConnectTimeout int    `yaml:"connect-timeout"` // 连接超时时间（秒）
+		ReadTimeout    int    `yaml:"read-timeout"`    // 读超时时间（秒）
+		WriteTimeout   int    `yaml:"write-timeout"`   // 写超时时间（秒）
+	} `yaml:"redis"`
 }
 
 /**

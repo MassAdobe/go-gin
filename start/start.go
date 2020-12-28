@@ -12,6 +12,7 @@ import (
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/nacos"
 	"github.com/MassAdobe/go-gin/pojo"
+	"github.com/MassAdobe/go-gin/rds"
 	"github.com/MassAdobe/go-gin/systemUtils"
 	"github.com/MassAdobe/go-gin/validated"
 	"gopkg.in/yaml.v2"
@@ -47,6 +48,7 @@ func init() {
 	nacos.NacosDiscovery()                  // nacos服务注册发现
 	db.InitDB()                             // 初始化DB
 	validated.InitValidator()               // 初始化校验器
+	rds.InitRds()                           // 初始化redis连接池
 }
 
 /**
