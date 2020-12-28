@@ -62,11 +62,13 @@ func GracefulShutdown(server *http.Server) {
 	sig := <-quit
 	logs.Lg.Info("准备关闭", logs.SpecDesc("收到信号", sig))
 	now := time.Now()
-	nacos.NacosDeregister() // nacos注销服务
 	cxt, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 	defer cancel()
 	if err := server.Shutdown(cxt); err != nil {
 		logs.Lg.Error("关闭失败", err)
 	}
+	nacos.NacosDeregister() // nacos注销服务
+	rds.CloseRds()          // 关闭Redis并释放句柄
+	db.CloseDb()            // 关停数据库连接池，释放句柄
 	logs.Lg.Info("退出成功", logs.Desc(fmt.Sprintf("退出花费时间: %v", time.Since(now))))
 }

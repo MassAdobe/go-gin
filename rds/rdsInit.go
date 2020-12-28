@@ -70,6 +70,7 @@ func InitRds() {
 						redis.DialWriteTimeout(time.Duration(nacos.InitConfiguration.Redis.WriteTimeout)*time.Second))
 				},
 			}
+			checkConn() // 校验是否成功连接
 			return
 		}
 		Redis = &redis.Pool{
@@ -115,4 +116,19 @@ func checkConn() {
 **/
 func Get() redis.Conn {
 	return Redis.Get()
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2020/12/28 2:27 下午
+ * @Description: 关停redis连接池，释放句柄
+**/
+func CloseRds() {
+	if 0 != len(nacos.InitConfiguration.Redis.IpPort) {
+		if err := Redis.Close(); err != nil {
+			logs.Lg.Error("Redis连接", err)
+			return
+		}
+		logs.Lg.Info("Redis连接", logs.Desc("关闭Redis连接池成功"))
+	}
 }
