@@ -27,6 +27,8 @@
 >> + redis连接池（可选）；
 >> + 增加了关闭系统时，释放Redis连接池与数据库连接池的句柄；
 
+---
+
 ## 配置文件
 ```yaml
 # 是否开启nacos配置中心
@@ -50,6 +52,8 @@ LogPath: ''
 # 日志级别(本地配置优先级最高)
 LogLevel: ''
 ```
+
+---
 
 ## nacos配置文件
 ```yaml
@@ -117,8 +121,57 @@ redis:
   max-active: 4
   # 最大挂起时间（秒）
   idle-timeout: 60
-
 ```
+
+---
+
+## nacos自定义配置内容使用
+### 配置内容
+#### 在nacos中进行配置
+```yaml
+# 注：配置完毕后，在启动项目时，会增加监听，配置的字段为热配置，会随着nacos的配置文件修改和发布进行改变。
+nacos-test-int: 100
+nacos_test_struct:
+  nacos-test-string: 'string word'
+  nacos-test-bool: false
+```
+### 配置结构体声明
+```go
+type SignInNacos struct {
+	NacosTestInt    int `json:"nacos_test_int" yaml:"nacos-test-int"`
+	NacosTestStruct struct {
+		NacosTestString string `json:"nacos_test_string" yaml:"nacos-test-string"`
+		NacosTestBool   bool   `json:"nacos_test_bool" yaml:"nacos-test-bool"`
+	} `json:"nacos_test_struct" yaml:"nacos_test_struct"`
+}
+```
+### 使用方式
+```go
+// 全局声明使用的实体类
+var (
+	testNacos *params.SignInNacos
+)
+
+// 在init方法中把实体类实例化后放入全局配置处理容器中
+func init() {
+    // testNacos = &params.SignInNacos{} // 实体化方式 ①
+    testNacos = new(params.SignInNacos)  // 实体化方式 ②
+    nacos.InsertSelfProfile(testNacos)   // 放入全局配置处理容器中
+}
+```
+### 使用配置内容
+```go
+	// 返回信息
+	validated.SuccRes(c, &params.SignInRtn{
+		UserName:        signInParam.UserName,
+		PassWord:        signInParam.PassWord,
+		Timestamp:       signInParam.Timestamp,
+		NacosTestInt:    testNacos.NacosTestInt,                    // 使用
+		NacosTestBool:   testNacos.NacosTestStruct.NacosTestBool,   // 使用
+		NacosTestString: testNacos.NacosTestStruct.NacosTestString, // 使用
+	})
+```
+
 
 >#### 未做功能
 >> + 服务熔断；

@@ -42,9 +42,9 @@ func ReadNacosProfile(content string) *InitNacosConfiguration {
  * @TIME: 2020/12/21 3:39 下午
  * @Description: 返回配置文件自定义内容
 **/
-func ReadNacosSelfProfile(content string, pojo *interface{}) *interface{} {
-	if err := yaml.Unmarshal([]byte(content), &pojo); err != nil {
+func ReadNacosSelfProfile(content string, pojo interface{}) {
+	fmt.Println("99999999", pojo)
+	if err := yaml.Unmarshal([]byte(content), pojo); err != nil {
 		logs.Lg.Error("解析nacos配置", err, logs.Desc("解析nacos自定义配置失败"))
 	}
-	return pojo
 }

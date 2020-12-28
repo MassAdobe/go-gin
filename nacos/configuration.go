@@ -28,8 +28,12 @@ var (
 	configClient    config_client.IConfigClient // nacos服务配置中心client
 	namingClient    naming_client.INamingClient // nacos服务注册与发现client
 	NacosContent    string                      // nacos配置中心配置内容
-	NacosRegistPojo []*interface{}              // nacos注册的自主配置结构体
+	NacosRegistPojo map[int]interface{}         // nacos注册的自主配置结构体
 )
+
+func init() {
+	NacosRegistPojo = make(map[int]interface{})
+}
 
 /**
  * @Author: MassAdobe
@@ -109,6 +113,11 @@ func NacosConfiguration() {
 			fmt.Println(fmt.Sprintf("【SYSTEM】%s %s %v %s", systemUtils.RtnCurTime(), "【nacos配置中心】", contentErr, "nacos配置中心获取配置错误"))
 			os.Exit(1)
 		}
+		// 返回宿主系统自带参数配置
+		for _, v := range NacosRegistPojo {
+			fmt.Println("222222222222", v)
+			ReadNacosSelfProfile(NacosContent, v)
+		}
 		fmt.Println(fmt.Sprintf("【SYSTEM】%s %s %s %s", systemUtils.RtnCurTime(), "【nacos配置中心】", "【nacos配置】", "获取配置成功"))
 	}
 }
@@ -155,10 +164,9 @@ func ListenConfiguration() {
 					}
 				}
 				// 返回宿主系统自带参数配置
-				if len(NacosRegistPojo) != 0 {
-					for _, pj := range NacosRegistPojo {
-						pj = ReadNacosSelfProfile(data, pj)
-					}
+				for _, v := range NacosRegistPojo {
+					fmt.Println("222222222222", v)
+					ReadNacosSelfProfile(data, v)
 				}
 			},
 		})
@@ -180,4 +188,15 @@ func printModifiedLog(current string) {
 		logs.Desc(fmt.Sprintf("动态调整日志级别成功，由级别 %s 调至 %s",
 			strings.ToLower(pojo.InitConf.LogLevel), strings.ToLower(current))))
 	pojo.InitConf.LogLevel = strings.ToLower(current)
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2020/12/28 4:07 下午
+ * @Description: 插入自定义结构
+**/
+func InsertSelfProfile(st interface{}) {
+	key := len(NacosRegistPojo)
+	NacosRegistPojo[key] = st
+	fmt.Println("111111111", st)
 }
