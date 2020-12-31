@@ -115,7 +115,6 @@ func NacosConfiguration() {
 		}
 		// 返回宿主系统自带参数配置
 		for _, v := range NacosRegistPojo {
-			fmt.Println("222222222222", v)
 			ReadNacosSelfProfile(NacosContent, v)
 		}
 		fmt.Println(fmt.Sprintf("【SYSTEM】%s %s %s %s", systemUtils.RtnCurTime(), "【nacos配置中心】", "【nacos配置】", "获取配置成功"))
@@ -165,7 +164,6 @@ func ListenConfiguration() {
 				}
 				// 返回宿主系统自带参数配置
 				for _, v := range NacosRegistPojo {
-					fmt.Println("222222222222", v)
 					ReadNacosSelfProfile(data, v)
 				}
 			},
@@ -198,5 +196,4 @@ func printModifiedLog(current string) {
 func InsertSelfProfile(st interface{}) {
 	key := len(NacosRegistPojo)
 	NacosRegistPojo[key] = st
-	fmt.Println("111111111", st)
 }
