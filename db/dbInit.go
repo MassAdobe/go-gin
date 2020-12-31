@@ -11,7 +11,9 @@ import (
 	"github.com/MassAdobe/go-gin/nacos"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"go.uber.org/zap"
 	"os"
+	"strings"
 )
 
 /**
@@ -22,6 +24,11 @@ import (
 var (
 	Read  *gorm.DB // 读库
 	Write *gorm.DB // 写库
+)
+
+const (
+	DB_SQL = "sql"
+	DB_LOG = "log"
 )
 
 /**
@@ -41,7 +48,10 @@ func InitDB() {
 		} else {
 			gg.DB().SetMaxIdleConns(2)
 			gg.DB().SetMaxOpenConns(10)
+			gg.Debug()
 			gg.LogMode(true)
+			logger := &DbLog{}
+			gg.SetLogger(logger)
 			if err := gg.DB().Ping(); err != nil {
 				logs.Lg.Error("数据库连接", err, logs.Desc("读库初始化失败"))
 				os.Exit(1)
@@ -62,7 +72,10 @@ func InitDB() {
 		} else {
 			gg.DB().SetMaxIdleConns(2)
 			gg.DB().SetMaxOpenConns(10)
+			gg.Debug()
 			gg.LogMode(true)
+			logger := &DbLog{}
+			gg.SetLogger(logger)
 			if err := gg.DB().Ping(); err != nil {
 				logs.Lg.Error("数据库连接", err, logs.Desc("写库初始化失败"))
 				os.Exit(1)
@@ -98,5 +111,33 @@ func CloseDb() {
 	}
 	if len(nacos.InitConfiguration.Gorm.Read.Ip) != 0 || len(nacos.InitConfiguration.Gorm.Write.Ip) != 0 {
 		logs.Lg.Info("数据库连接", logs.Desc("关闭数据库连接池成功"))
+	}
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2020/12/31 1:07 下午
+ * @Description: 数据库日志实体类
+**/
+type DbLog struct{}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2020/12/31 1:07 下午
+ * @Description: 数据库日志方法
+**/
+func (logger *DbLog) Print(values ...interface{}) {
+	switch values[0] {
+	case DB_SQL:
+		logs.Lg.Debug(
+			"数据库日志",
+			zap.Any("资源", values[1]),
+			zap.String("执行时间", fmt.Sprintf("%v", values[2])),
+			zap.String("执行语句", strings.ReplaceAll(values[3].(string), "\n", "")),
+			zap.String("执行参数", fmt.Sprintf("%v", values[4])),
+			zap.String("影响行数", fmt.Sprintf("%v", values[5])),
+		)
+	case DB_LOG:
+		logs.Lg.Debug("数据库日志", zap.Any("其他", values[2]))
 	}
 }

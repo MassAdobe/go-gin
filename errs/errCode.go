@@ -28,6 +28,7 @@ const (
 	ErrGetRequestCode                         // Get请求错误
 	ErrPutRequestCode                         // Put请求错误
 	ErrDeleteRequestCode                      // Deleted请求错误
+	ErrCopyPropertyCode                       // 实体类转换错误
 
 	/*error desc*/
 	SuccessDesc                        = "成功"
@@ -46,6 +47,7 @@ const (
 	ErrGetRequestDesc                  = "Get请求错误"
 	ErrPutRequestDesc                  = "Put请求错误"
 	ErrDeleteRequestDesc               = "Deleted请求错误"
+	ErrCopyPropertyDesc                = "实体类转换错误"
 )
 
 /**
@@ -71,6 +73,7 @@ var CodeDescMap = map[int]string{
 	ErrGetRequestCode:                  ErrGetRequestDesc,
 	ErrPutRequestCode:                  ErrPutRequestDesc,
 	ErrDeleteRequestCode:               ErrDeleteRequestDesc,
+	ErrCopyPropertyCode:                ErrCopyPropertyDesc,
 }
 
 /**

@@ -17,6 +17,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -238,4 +239,50 @@ func RtnTmString() (timsStr string) {
 **/
 func RtnCurTime() string {
 	return time.Now().Format(TimeFormatMS)
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2020/12/31 2:03 下午
+ * @Description: Bean转换：dst目标Bean，src来源Bean
+**/
+func CopyProperty(dst, src interface{}) {
+	// 防止意外panic
+	defer func() {
+		if e := recover(); e != nil {
+			panic(errs.NewError(errs.ErrCopyPropertyCode))
+		}
+	}()
+	dstType, dstValue := reflect.TypeOf(dst), reflect.ValueOf(dst)
+	srcType, srcValue := reflect.TypeOf(src), reflect.ValueOf(src)
+	// dst必须结构体指针类型
+	if dstType.Kind() != reflect.Ptr || dstType.Elem().Kind() != reflect.Struct {
+		logs.Lg.Error("实体类转换", errors.New("dst type should be a struct pointer"))
+		panic(errs.NewError(errs.ErrCopyPropertyCode))
+	}
+	// src必须为结构体或者结构体指针
+	if srcType.Kind() == reflect.Ptr {
+		srcType, srcValue = srcType.Elem(), srcValue.Elem()
+	}
+	if srcType.Kind() != reflect.Struct {
+		logs.Lg.Error("实体类转换", errors.New("src type should be a struct or a struct pointer"))
+		panic(errs.NewError(errs.ErrCopyPropertyCode))
+	}
+	// 取具体内容
+	dstType, dstValue = dstType.Elem(), dstValue.Elem()
+	// 属性个数
+	propertyNums := dstType.NumField()
+	for i := 0; i < propertyNums; i++ {
+		// 属性
+		property := dstType.Field(i)
+		// 待填充属性值
+		propertyValue := srcValue.FieldByName(property.Name)
+		// 无效，说明src没有这个属性 || 属性同名但类型不同
+		if !propertyValue.IsValid() || property.Type != propertyValue.Type() {
+			continue
+		}
+		if dstValue.Field(i).CanSet() {
+			dstValue.Field(i).Set(propertyValue)
+		}
+	}
 }
