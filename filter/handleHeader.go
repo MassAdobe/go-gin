@@ -9,7 +9,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/MassAdobe/go-gin/config"
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/errs"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/systemUtils"
@@ -26,7 +26,7 @@ import (
 **/
 func GetReqUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if get := c.GetHeader(config.REQUEST_USER_KEY); len(get) != 0 {
+		if get := c.GetHeader(constants.REQUEST_USER_KEY); len(get) != 0 {
 			c.Next()
 		} else {
 			c.Abort()
@@ -44,21 +44,21 @@ func GetReqUser() gin.HandlerFunc {
 func SetTraceAndStep() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 跟踪ID
-		if trace := c.GetHeader(config.REQUEST_TRACE_ID); 0 != len(trace) {
-			c.Params = append(c.Params, gin.Param{Key: config.REQUEST_TRACE_ID, Value: trace})
+		if trace := c.GetHeader(constants.REQUEST_TRACE_ID); 0 != len(trace) {
+			c.Params = append(c.Params, gin.Param{Key: constants.REQUEST_TRACE_ID, Value: trace})
 		} else {
-			c.Params = append(c.Params, gin.Param{Key: config.REQUEST_TRACE_ID, Value: systemUtils.RandomTimestampMark()})
+			c.Params = append(c.Params, gin.Param{Key: constants.REQUEST_TRACE_ID, Value: systemUtils.RandomTimestampMark()})
 		}
 		// 步骤ID
-		if step := c.GetHeader(config.REQUEST_STEP_ID); 0 != len(step) {
+		if step := c.GetHeader(constants.REQUEST_STEP_ID); 0 != len(step) {
 			if parseInt, err := strconv.ParseInt(step, 10, 64); err != nil {
 				logs.Lg.Error("解析stepId出错", errors.New("Marshal stepId error"))
 				c.Abort()
 			} else {
-				c.Params = append(c.Params, gin.Param{Key: config.REQUEST_STEP_ID, Value: strconv.FormatInt(parseInt+1, 10)})
+				c.Params = append(c.Params, gin.Param{Key: constants.REQUEST_STEP_ID, Value: strconv.FormatInt(parseInt+1, 10)})
 			}
 		} else {
-			c.Params = append(c.Params, gin.Param{Key: config.REQUEST_STEP_ID, Value: "0"})
+			c.Params = append(c.Params, gin.Param{Key: constants.REQUEST_STEP_ID, Value: "0"})
 		}
 		// 切面打入调用日志
 		if http.MethodPost == c.Request.Method {

@@ -7,7 +7,7 @@ package context
 
 import (
 	"fmt"
-	"github.com/MassAdobe/go-gin/config"
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -113,11 +113,11 @@ func (this *Context) Error(msg string, err error, fields ...zap.Field) {
 **/
 func (this *Context) setTraceAndStep() []zap.Field {
 	newFields := make([]zap.Field, 0)
-	if value, has := this.GinContext.Params.Get(config.REQUEST_TRACE_ID); has {
-		newFields = append(newFields, zap.Any(config.REQUEST_TRACE_ID, value))
+	if value, has := this.GinContext.Params.Get(constants.REQUEST_TRACE_ID); has {
+		newFields = append(newFields, zap.Any(constants.REQUEST_TRACE_ID, value))
 	}
-	if value, has := this.GinContext.Params.Get(config.REQUEST_STEP_ID); has {
-		newFields = append(newFields, zap.Any(config.REQUEST_STEP_ID, value))
+	if value, has := this.GinContext.Params.Get(constants.REQUEST_STEP_ID); has {
+		newFields = append(newFields, zap.Any(constants.REQUEST_STEP_ID, value))
 	}
 	return newFields
 }

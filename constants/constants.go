@@ -3,7 +3,7 @@
  * @Author : MassAdobe
  * @Description: config
 **/
-package config
+package constants
 
 import "time"
 
@@ -21,3 +21,14 @@ const (
 	REQUEST_STEP_ID    = "step-id"                      // 步骤ID
 )
 
+/**
+ * @Author: MassAdobe
+ * @TIME: 2021/1/5 6:39 下午
+ * @Description: 基本参数常量
+**/
+const (
+	HAS_DELETED = "0" // 已删除
+	NOT_DELETED = "1" // 未删除
+	NOT_ENABLED = "0" // 无效
+	IS_ENABLED  = "1" // 有效
+)

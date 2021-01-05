@@ -8,7 +8,7 @@ package http
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/MassAdobe/go-gin/config"
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/errs"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/gin-gonic/gin"
@@ -29,22 +29,22 @@ func Get(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, err
 		err  error
 	)
 	url = url + urlEncode(params)
-	client := http.Client{Timeout: config.REQUEST_TIMEOUT_TM}
+	client := http.Client{Timeout: constants.REQUEST_TIMEOUT_TM}
 	request, requestErr := http.NewRequest(http.MethodGet, fmt.Sprintf("http://%s%s", ipPort, url), nil)
 	if nil != requestErr {
 		logs.Lg.Error("Get请求", requestErr, c, logs.Desc(strings.NewReader(url)))
 		return nil, requestErr
 	}
-	request.Header.Add(config.CONTENT_TYPE_KEY, config.CONTENT_TYPE_INNER)
+	request.Header.Add(constants.CONTENT_TYPE_KEY, constants.CONTENT_TYPE_INNER)
 	if len(c) != 0 {
-		if user, has := c[0].Params.Get(config.REQUEST_USER_KEY); has {
-			request.Header.Add(config.REQUEST_USER_KEY, user)
+		if user, has := c[0].Params.Get(constants.REQUEST_USER_KEY); has {
+			request.Header.Add(constants.REQUEST_USER_KEY, user)
 		}
-		if trace, has := c[0].Params.Get(config.REQUEST_TRACE_ID); has {
-			request.Header.Add(config.REQUEST_TRACE_ID, trace)
+		if trace, has := c[0].Params.Get(constants.REQUEST_TRACE_ID); has {
+			request.Header.Add(constants.REQUEST_TRACE_ID, trace)
 		}
-		if step, has := c[0].Params.Get(config.REQUEST_STEP_ID); has {
-			request.Header.Add(config.REQUEST_STEP_ID, step)
+		if step, has := c[0].Params.Get(constants.REQUEST_STEP_ID); has {
+			request.Header.Add(constants.REQUEST_STEP_ID, step)
 		}
 	}
 	if resp, err = client.Do(request); err != nil {
@@ -81,23 +81,23 @@ func Post(ipPort, url, params interface{}, c ...*gin.Context) ([]byte, error) {
 			req = string(bytes)
 		}
 	}
-	client := http.Client{Timeout: config.REQUEST_TIMEOUT_TM}
+	client := http.Client{Timeout: constants.REQUEST_TIMEOUT_TM}
 	requestUrl := fmt.Sprintf("http://%s%s", ipPort, url)
 	request, requestErr := http.NewRequest(http.MethodPost, requestUrl, strings.NewReader(req))
 	if nil != requestErr {
 		logs.Lg.Error("Post请求", requestErr, c, logs.Desc(strings.NewReader(requestUrl)))
 		return nil, requestErr
 	}
-	request.Header.Add(config.CONTENT_TYPE_KEY, config.CONTENT_TYPE_INNER)
+	request.Header.Add(constants.CONTENT_TYPE_KEY, constants.CONTENT_TYPE_INNER)
 	if len(c) != 0 {
-		if user, has := c[0].Params.Get(config.REQUEST_USER_KEY); has {
-			request.Header.Add(config.REQUEST_USER_KEY, user)
+		if user, has := c[0].Params.Get(constants.REQUEST_USER_KEY); has {
+			request.Header.Add(constants.REQUEST_USER_KEY, user)
 		}
-		if trace, has := c[0].Params.Get(config.REQUEST_TRACE_ID); has {
-			request.Header.Add(config.REQUEST_TRACE_ID, trace)
+		if trace, has := c[0].Params.Get(constants.REQUEST_TRACE_ID); has {
+			request.Header.Add(constants.REQUEST_TRACE_ID, trace)
 		}
-		if step, has := c[0].Params.Get(config.REQUEST_STEP_ID); has {
-			request.Header.Add(config.REQUEST_STEP_ID, step)
+		if step, has := c[0].Params.Get(constants.REQUEST_STEP_ID); has {
+			request.Header.Add(constants.REQUEST_STEP_ID, step)
 		}
 	}
 	if resp, err = client.Do(request); err != nil {
@@ -127,19 +127,19 @@ func Put(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, err
 		logs.Lg.Error("Put请求", requestErr, c, logs.Desc(strings.NewReader(url)))
 		return nil, requestErr
 	}
-	request.Header.Add(config.CONTENT_TYPE_KEY, config.CONTENT_TYPE_INNER)
+	request.Header.Add(constants.CONTENT_TYPE_KEY, constants.CONTENT_TYPE_INNER)
 	if len(c) != 0 {
-		if user, has := c[0].Params.Get(config.REQUEST_USER_KEY); has {
-			request.Header.Add(config.REQUEST_USER_KEY, user)
+		if user, has := c[0].Params.Get(constants.REQUEST_USER_KEY); has {
+			request.Header.Add(constants.REQUEST_USER_KEY, user)
 		}
-		if trace, has := c[0].Params.Get(config.REQUEST_TRACE_ID); has {
-			request.Header.Add(config.REQUEST_TRACE_ID, trace)
+		if trace, has := c[0].Params.Get(constants.REQUEST_TRACE_ID); has {
+			request.Header.Add(constants.REQUEST_TRACE_ID, trace)
 		}
-		if step, has := c[0].Params.Get(config.REQUEST_STEP_ID); has {
-			request.Header.Add(config.REQUEST_STEP_ID, step)
+		if step, has := c[0].Params.Get(constants.REQUEST_STEP_ID); has {
+			request.Header.Add(constants.REQUEST_STEP_ID, step)
 		}
 	}
-	client := http.Client{Timeout: config.REQUEST_TIMEOUT_TM}
+	client := http.Client{Timeout: constants.REQUEST_TIMEOUT_TM}
 	resp, err := client.Do(request)
 	defer resp.Body.Close()
 	if err != nil {
@@ -165,19 +165,19 @@ func Delete(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, 
 		logs.Lg.Error("Delete请求", requestErr, c, logs.Desc(strings.NewReader(url)))
 		return nil, requestErr
 	}
-	request.Header.Add(config.CONTENT_TYPE_KEY, config.CONTENT_TYPE_INNER)
+	request.Header.Add(constants.CONTENT_TYPE_KEY, constants.CONTENT_TYPE_INNER)
 	if len(c) != 0 {
-		if user, has := c[0].Params.Get(config.REQUEST_USER_KEY); has {
-			request.Header.Add(config.REQUEST_USER_KEY, user)
+		if user, has := c[0].Params.Get(constants.REQUEST_USER_KEY); has {
+			request.Header.Add(constants.REQUEST_USER_KEY, user)
 		}
-		if trace, has := c[0].Params.Get(config.REQUEST_TRACE_ID); has {
-			request.Header.Add(config.REQUEST_TRACE_ID, trace)
+		if trace, has := c[0].Params.Get(constants.REQUEST_TRACE_ID); has {
+			request.Header.Add(constants.REQUEST_TRACE_ID, trace)
 		}
-		if step, has := c[0].Params.Get(config.REQUEST_STEP_ID); has {
-			request.Header.Add(config.REQUEST_STEP_ID, step)
+		if step, has := c[0].Params.Get(constants.REQUEST_STEP_ID); has {
+			request.Header.Add(constants.REQUEST_STEP_ID, step)
 		}
 	}
-	client := http.Client{Timeout: config.REQUEST_TIMEOUT_TM}
+	client := http.Client{Timeout: constants.REQUEST_TIMEOUT_TM}
 	resp, err := client.Do(request)
 	defer resp.Body.Close()
 	if err != nil {

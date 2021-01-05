@@ -8,7 +8,7 @@ package logs
 import (
 	_ "encoding/json"
 	"fmt"
-	"github.com/MassAdobe/go-gin/config"
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/pojo"
 	"github.com/gin-gonic/gin"
 	"github.com/natefinch/lumberjack"
@@ -266,19 +266,19 @@ func (this *MyLog) setTraceAndStep(contextAndFields ...interface{}) []zap.Field 
 		switch t.String() {
 		case GIN_CONTEXT_TYPE:
 			context := contextAndField.(*gin.Context)
-			if value, has := context.Params.Get(config.REQUEST_TRACE_ID); has {
-				newFields = append(newFields, zap.Any(config.REQUEST_TRACE_ID, value))
+			if value, has := context.Params.Get(constants.REQUEST_TRACE_ID); has {
+				newFields = append(newFields, zap.Any(constants.REQUEST_TRACE_ID, value))
 			}
-			if value, has := context.Params.Get(config.REQUEST_STEP_ID); has {
-				newFields = append(newFields, zap.Any(config.REQUEST_STEP_ID, value))
+			if value, has := context.Params.Get(constants.REQUEST_STEP_ID); has {
+				newFields = append(newFields, zap.Any(constants.REQUEST_STEP_ID, value))
 			}
 		case GIN_CONTEXT_TYPES:
 			context := contextAndField.([]*gin.Context)[0]
-			if value, has := context.Params.Get(config.REQUEST_TRACE_ID); has {
-				newFields = append(newFields, zap.Any(config.REQUEST_TRACE_ID, value))
+			if value, has := context.Params.Get(constants.REQUEST_TRACE_ID); has {
+				newFields = append(newFields, zap.Any(constants.REQUEST_TRACE_ID, value))
 			}
-			if value, has := context.Params.Get(config.REQUEST_STEP_ID); has {
-				newFields = append(newFields, zap.Any(config.REQUEST_STEP_ID, value))
+			if value, has := context.Params.Get(constants.REQUEST_STEP_ID); has {
+				newFields = append(newFields, zap.Any(constants.REQUEST_STEP_ID, value))
 			}
 		case ZAP_FIELD_TYPE:
 			newFields = append(newFields, contextAndField.(zapcore.Field))
