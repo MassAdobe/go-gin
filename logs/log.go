@@ -30,7 +30,7 @@ var (
  * @Description: 日志对象
 **/
 type MyLog struct {
-	zapLog *zap.Logger
+	ZapLog *zap.Logger
 	Level  zap.AtomicLevel
 }
 
@@ -40,13 +40,13 @@ type MyLog struct {
  * @Description: 日志常量
 **/
 const (
-	TIME              = "TIME"
-	LOG_LEVEL         = "LOG-LEVEL"
-	LOGGER            = "LOGGER"
-	DESC              = "DESC"
-	MSG               = "MSG"
-	TRACE             = "TRACE"
-	ERROR             = "ERROR"
+	TIME              = "time"
+	LOG_LEVEL         = "log_level"
+	LOGGER            = "logger"
+	DESC              = "desc"
+	MSG               = "msg"
+	TRACE             = "trace"
+	ERROR             = "error"
 	TIME_FORMAT       = "2006-01-02 15:04:05.000"
 	ZAP_FIELD_TYPE    = "zapcore.Field"
 	GIN_CONTEXT_TYPE  = "*gin.Context"
@@ -60,8 +60,8 @@ const (
 **/
 func NewLogger(filePath, level string, maxSize, maxBackups, maxAge int, compress bool, serviceName string) {
 	core := newCore(filePath, level, maxSize, maxBackups, maxAge, compress)
-	Lg.zapLog = zap.New(core, zap.AddCaller(), zap.Development(), zap.Fields(zap.String("SERVER-NAME", serviceName)))
-	zap.ReplaceGlobals(Lg.zapLog)
+	Lg.ZapLog = zap.New(core, zap.AddCaller(), zap.Development(), zap.Fields(zap.String("server_name", serviceName)))
+	zap.ReplaceGlobals(Lg.ZapLog)
 	Lg.Info("日志启动成功")
 }
 
@@ -198,9 +198,9 @@ func (this *MyLog) GlobalError(msg string, contextAndFields ...interface{}) {
 	fields := this.setTraceAndStep(contextAndFields...)
 	pc, file, line, _ := runtime.Caller(1)
 	f := runtime.FuncForPC(pc)
-	fields = append(fields, zap.Any("FUNCTION", f.Name()))
-	fields = append(fields, zap.Any("PATH-NUM", fmt.Sprintf("%s:%d", file, line)))
-	if ce := this.zapLog.Check(zapcore.ErrorLevel, msg); ce != nil {
+	fields = append(fields, zap.Any("function", f.Name()))
+	fields = append(fields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
+	if ce := this.ZapLog.Check(zapcore.ErrorLevel, msg); ce != nil {
 		ce.Write(fields...)
 	}
 }
@@ -214,9 +214,9 @@ func (this *MyLog) Debug(msg string, contextAndFields ...interface{}) {
 	fields := this.setTraceAndStep(contextAndFields...)
 	pc, file, line, _ := runtime.Caller(1)
 	f := runtime.FuncForPC(pc)
-	fields = append(fields, zap.Any("FUNCTION", f.Name()))
-	fields = append(fields, zap.Any("PATH-NUM", fmt.Sprintf("%s:%d", file, line)))
-	if ce := this.zapLog.Check(zapcore.DebugLevel, msg); ce != nil {
+	fields = append(fields, zap.Any("function", f.Name()))
+	fields = append(fields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
+	if ce := this.ZapLog.Check(zapcore.DebugLevel, msg); ce != nil {
 		ce.Write(fields...)
 	}
 }
@@ -230,25 +230,9 @@ func (this *MyLog) Info(msg string, contextAndFields ...interface{}) {
 	fields := this.setTraceAndStep(contextAndFields...)
 	pc, file, line, _ := runtime.Caller(1)
 	f := runtime.FuncForPC(pc)
-	fields = append(fields, zap.Any("FUNCTION", f.Name()))
-	fields = append(fields, zap.Any("PATH-NUM", fmt.Sprintf("%s:%d", file, line)))
-	if ce := this.zapLog.Check(zapcore.InfoLevel, msg); ce != nil {
-		ce.Write(fields...)
-	}
-}
-
-/**
- * @Author: MassAdobe
- * @TIME: 2020/12/17 7:52 下午
- * @Description: 重写Warn日志级别输出
-**/
-func (this *MyLog) Warn(msg string, contextAndFields ...interface{}) {
-	fields := this.setTraceAndStep(contextAndFields...)
-	pc, file, line, _ := runtime.Caller(1)
-	f := runtime.FuncForPC(pc)
-	fields = append(fields, zap.Any("FUNCTION", f.Name()))
-	fields = append(fields, zap.Any("PATH-NUM", fmt.Sprintf("%s:%d", file, line)))
-	if ce := this.zapLog.Check(zapcore.WarnLevel, msg); ce != nil {
+	fields = append(fields, zap.Any("function", f.Name()))
+	fields = append(fields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
+	if ce := this.ZapLog.Check(zapcore.InfoLevel, msg); ce != nil {
 		ce.Write(fields...)
 	}
 }
@@ -263,9 +247,9 @@ func (this *MyLog) Error(msg string, err error, contextAndFields ...interface{})
 	pc, file, line, _ := runtime.Caller(1)
 	f := runtime.FuncForPC(pc)
 	fields = append(fields, Error(err))
-	fields = append(fields, zap.Any("FUNCTION", f.Name()))
-	fields = append(fields, zap.Any("PATH-NUM", fmt.Sprintf("%s:%d", file, line)))
-	if ce := this.zapLog.Check(zapcore.ErrorLevel, msg); ce != nil {
+	fields = append(fields, zap.Any("function", f.Name()))
+	fields = append(fields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
+	if ce := this.ZapLog.Check(zapcore.ErrorLevel, msg); ce != nil {
 		ce.Write(fields...)
 	}
 }

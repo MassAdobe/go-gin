@@ -204,11 +204,11 @@ func init() {
 ```
 ### 业务使用
 ```go
-func SignIn(c *gin.Context) {
+func SignIn(c *context.Context) {
 	signInParam := new(params.SignInParam)
 	validated.BindAndCheck(c, signInParam)
-	logs.Lg.Debug("登录", c)
-	logs.Lg.Info("登录", c, logs.Desc("abc"))
+	c.Debug("登录")
+	c.Info("登录", logs.Desc("abc"))
 	if len(signInParam.UserName) == 0 {
         panic(errs.NewError(wrong.ErrLoginCode)) // 使用panic全局报错
     }
