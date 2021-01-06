@@ -3,7 +3,7 @@
  * @Author : MassAdobe
  * @Description: context
 **/
-package context
+package goContext
 
 import (
 	"fmt"
@@ -12,6 +12,7 @@ import (
 	"github.com/MassAdobe/go-gin/filter"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/pojo"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -42,6 +43,7 @@ func NewRouter() (rtr *gin.Engine) {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	rtr = gin.New()
+	rtr.Use(cors.Default())           // 增加跨域处理
 	rtr.NoMethod(errs.HandleNotFound) // 处理没有相关方法时的错误处理
 	rtr.NoRoute(errs.HandleNotFound)  // 处理没有相关路由时的错误处理
 	rtr.Use(errs.ErrHandler())        // 全局错误处理
@@ -63,10 +65,9 @@ type HandlerFunc func(c *Context)
  * @TIME: 2021/1/6 10:03 上午
  * @Description: 处理日志与gin框架合并
 **/
-func Handle(h HandlerFunc) gin.HandlerFunc {
+func Handle(handle HandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := &Context{c, &logs.Lg}
-		h(ctx)
+		handle(&Context{c, &logs.Lg})
 	}
 }
 

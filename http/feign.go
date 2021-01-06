@@ -7,8 +7,8 @@ package http
 
 import (
 	"fmt"
-	"github.com/MassAdobe/go-gin/context"
 	"github.com/MassAdobe/go-gin/errs"
+	"github.com/MassAdobe/go-gin/goContext"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/nacos"
 )
@@ -19,11 +19,11 @@ import (
  * @Description: 服务内部调用get请求结构体
 **/
 type FeignRequest struct {
-	Body       interface{}      // 请求参数，可以为空
-	ServerName string           // 服务名，不能为空
-	GroupName  string           // 组别名，不能为空
-	Url        string           // 调用URL(二级路径)
-	C          *context.Context // 当前请求的上下文
+	Body       interface{}        // 请求参数，可以为空
+	ServerName string             // 服务名，不能为空
+	GroupName  string             // 组别名，不能为空
+	Url        string             // 调用URL(二级路径)
+	C          *goContext.Context // 当前请求的上下文
 }
 
 /**
@@ -49,7 +49,7 @@ func (this *FeignRequest) FeignGet() (feign []byte, err error) {
 	return
 }
 
-func getFeign(serviceName, groupName, url string, params interface{}, c *context.Context) ([]byte, error) {
+func getFeign(serviceName, groupName, url string, params interface{}, c *goContext.Context) ([]byte, error) {
 	if instance, err := nacos.NacosGetServer(serviceName, groupName); err != nil {
 		c.Error("服务内部调用get请求", err)
 		panic(errs.NewError(errs.ErrInnerCallingCode, err))
@@ -86,7 +86,7 @@ func (this *FeignRequest) FeignPost() (feign []byte, err error) {
 	return
 }
 
-func postFeign(serviceName, groupName, url string, params interface{}, c *context.Context) ([]byte, error) {
+func postFeign(serviceName, groupName, url string, params interface{}, c *goContext.Context) ([]byte, error) {
 	if instance, err := nacos.NacosGetServer(serviceName, groupName); err != nil {
 		c.Error("服务内部调用post请求", err)
 		panic(errs.NewError(errs.ErrInnerCallingCode, err))
@@ -123,7 +123,7 @@ func (this *FeignRequest) FeignPut() (feign []byte, err error) {
 	return
 }
 
-func putFeign(serviceName, groupName, url string, params interface{}, c *context.Context) ([]byte, error) {
+func putFeign(serviceName, groupName, url string, params interface{}, c *goContext.Context) ([]byte, error) {
 	if instance, err := nacos.NacosGetServer(serviceName, groupName); err != nil {
 		c.Error("服务内部调用put请求", err)
 		panic(errs.NewError(errs.ErrInnerCallingCode, err))
@@ -160,7 +160,7 @@ func (this *FeignRequest) FeignDelete() (feign []byte, err error) {
 	return
 }
 
-func deleteFeign(serviceName, groupName, url string, params interface{}, c *context.Context) ([]byte, error) {
+func deleteFeign(serviceName, groupName, url string, params interface{}, c *goContext.Context) ([]byte, error) {
 	if instance, err := nacos.NacosGetServer(serviceName, groupName); err != nil {
 		c.Error("服务内部调用delete请求", err)
 		panic(errs.NewError(errs.ErrInnerCallingCode, err))

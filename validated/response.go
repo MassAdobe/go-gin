@@ -6,8 +6,8 @@
 package validated
 
 import (
-	"github.com/MassAdobe/go-gin/context"
 	"github.com/MassAdobe/go-gin/errs"
+	"github.com/MassAdobe/go-gin/goContext"
 	"github.com/MassAdobe/go-gin/logs"
 	"net/http"
 )
@@ -42,7 +42,7 @@ func res(code int, data interface{}) (rtn *Response) {
  * @TIME: 2020-04-26 21:12
  * @Description: 成功时返回 支持data为空
 **/
-func SuccRes(c *context.Context, data interface{}) {
+func SuccRes(c *goContext.Context, data interface{}) {
 	c.Info("响应日志",
 		logs.SpecDesc("请求方法", c.GinContext.Request.Method),
 		logs.SpecDesc("请求路径", c.GinContext.Request.URL),
@@ -55,7 +55,7 @@ func SuccRes(c *context.Context, data interface{}) {
  * @TIME: 2020-04-26 21:12
  * @Description: 错误时返回 支持data为空
 **/
-func FailRes(c *context.Context, errCode int, data interface{}) {
+func FailRes(c *goContext.Context, errCode int, data interface{}) {
 	c.Info("响应日志",
 		logs.SpecDesc("请求方法", c.GinContext.Request.Method),
 		logs.SpecDesc("请求路径", c.GinContext.Request.URL),
@@ -68,7 +68,7 @@ func FailRes(c *context.Context, errCode int, data interface{}) {
  * @TIME: 2020/12/18 6:19 下午
  * @Description: 内部调用 成功时返回 支持data为空
 **/
-func SuccResFeign(c *context.Context, data interface{}) {
+func SuccResFeign(c *goContext.Context, data interface{}) {
 	c.Info("响应日志",
 		logs.SpecDesc("请求方法", c.GinContext.Request.Method),
 		logs.SpecDesc("请求路径", c.GinContext.Request.URL),

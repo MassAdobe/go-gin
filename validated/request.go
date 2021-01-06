@@ -6,8 +6,8 @@
 package validated
 
 import (
-	"github.com/MassAdobe/go-gin/context"
 	"github.com/MassAdobe/go-gin/errs"
+	"github.com/MassAdobe/go-gin/goContext"
 	"github.com/MassAdobe/go-gin/logs"
 )
 
@@ -16,7 +16,7 @@ import (
  * @TIME: 2020-04-30 16:31
  * @Description: 绑定参数并验证参数
 **/
-func BindAndCheck(c *context.Context, data interface{}) {
+func BindAndCheck(c *goContext.Context, data interface{}) {
 	if err := c.GinContext.Bind(&data); err != nil { // 获取参数
 		logs.Lg.Error("解析入参错误", err, c)
 		panic(errs.NewError(errs.ErrParamCode))
