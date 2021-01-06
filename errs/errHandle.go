@@ -17,7 +17,7 @@ import (
  * @Description: 错误处理的结构体
 **/
 type Error struct {
-	StatusCode int         `json:"-"`
+	StatusCode int         `json:"status"`
 	Code       int         `json:"code"`
 	Msg        string      `json:"msg"`
 	Data       interface{} `json:"data"`
@@ -38,6 +38,18 @@ func NewError(code int, errs ...error) *Error {
 		return BasicNewError(http.StatusOK, code, "", errs[0])
 	}
 	return BasicNewError(http.StatusOK, code, "", nil)
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2021/1/6 11:03 上午
+ * @Description: 创建新超时异常
+**/
+func NewTimeOutError(code int, errs ...error) *Error {
+	if len(errs) != 0 {
+		return BasicNewError(http.StatusRequestTimeout, code, "", errs[0])
+	}
+	return BasicNewError(http.StatusRequestTimeout, code, "", nil)
 }
 
 /**

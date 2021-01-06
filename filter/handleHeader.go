@@ -30,7 +30,7 @@ func GetReqUser() gin.HandlerFunc {
 			c.Next()
 		} else {
 			c.Abort()
-			logs.Lg.Error("头中用户信息为空", errors.New("Nil in header"))
+			logs.Lg.Error("头中用户信息为空", errors.New("nil in header"), c)
 			panic(errs.NewError(errs.ErrHeaderUserCode))
 		}
 	}

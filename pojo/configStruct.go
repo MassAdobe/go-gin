@@ -30,6 +30,7 @@ type InitConfig struct {
 	NacosClientTimeoutMs   uint64 `yaml:"NacosClientTimeoutMs"`   // 请求Nacos服务端的超时时间，默认是10000ms
 	NacosDataId            string `yaml:"NacosDataId"`            // nacos配置文件名称
 	NacosGroup             string `yaml:"NacosGroup"`             // nacos配置组名称
+	ProgramEnv             string `yaml:"ProgramEnv"`             // 项目启动环境：DEBUG-开发，TEST-测试，RELEASE-生产
 	LogPath                string `yaml:"LogPath"`                // 日志输出路径(本地配置优先级最高)
 	LogLevel               string `yaml:"LogLevel"`               // 日志级别(本地配置优先级最高)
 }
@@ -40,23 +41,6 @@ type InitConfig struct {
  * @Description: 系统配置
 **/
 type SysConfig struct {
-	LogPath             string `yaml:"LogPath"`             // 日志地址
-	LogLevel            string `yaml:"LogLevel"`            // 日志级别
-	RegisterIp          string `yaml:"RegisterIp"`          // 注册IP地址
-	RedisMaxIdle        int    `yaml:"RedisMaxIdle"`        // Redis最大挂起数
-	RedisMaxActive      int    `yaml:"RedisMaxActive"`      // Redis最大活跃数
-	RedisMaxIdleTimeout int    `yaml:"RedisMaxIdleTimeout"` // Redis最大挂起时间
-	RedisHost           string `yaml:"RedisHost"`           // Redis地址
-	RedisPassword       string `yaml:"RedisPassword"`       // Redis密码
-	RedisDb             int    `yaml:"RedisDb"`             // Redis数据库
-	RedisConnectTimeout int    `yaml:"RedisConnectTimeout"` // Redis连接超时
-	RedisReadTimeout    int    `yaml:"RedisReadTimeout"`    // Redis读超时
-	RedisWriteTimeout   int    `yaml:"RedisWriteTimeout"`   // Redis写超时
-	TokenVerify         string `yaml:"TokenVerify"`         // Token中校验元素secret
-	JwtKey              string `yaml:"JwtKey"`              // JWT认证加密私钥
-	MysqlUser           string `yaml:"MysqlUser"`           // 数据库用户名
-	MysqlPassword       string `yaml:"MysqlPassword"`       // 数据库密码
-	MysqlHost           string `yaml:"MysqlHost"`           // 数据库IP
-	MysqlPort           string `yaml:"MysqlPort"`           // 数据库端口
-	MysqlDbName         string `yaml:"MysqlDbName"`         // 数据库名称
+	TokenVerify string `yaml:"TokenVerify"` // Token中校验元素secret
+	JwtKey      string `yaml:"JwtKey"`      // JWT认证加密私钥
 }

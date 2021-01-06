@@ -14,6 +14,8 @@ NacosClientTimeoutMs: 5000
 NacosDataId: 'go-framework.yml'
 # nacos配置组名称
 NacosGroup: 'go-framework'
+# 项目启动环境：DEBUG-开发，TEST-测试，RELEASE-生产
+ProgramEnv: 'DEBUG'
 # 日志输出路径(本地配置优先级最高)
 LogPath: ''
 # 日志级别(本地配置优先级最高)

@@ -27,6 +27,8 @@
 >> + redis连接池（可选）；
 >> + 增加了关闭系统时，释放Redis连接池与数据库连接池的句柄；
 >> + 业务报错适配器；
+>> + 请求超时处理，统一配置预设值，提前返回超时设置；
+>> + 根据配置环境不同，加载方式变更（开发环境没有超时设定，支撑Debug）;
 
 ---
 
@@ -48,6 +50,8 @@ NacosClientTimeoutMs: 5000
 NacosDataId: 'go-framework.yml'
 # nacos配置组名称
 NacosGroup: 'go-framework'
+# 项目启动环境：DEBUG-开发，TEST-测试，RELEASE-生产
+ProgramEnv: 'DEBUG'
 # 日志输出路径(本地配置优先级最高)
 LogPath: ''
 # 日志级别(本地配置优先级最高)
@@ -209,7 +213,7 @@ func SignIn(c *context.Context) {
 	validated.BindAndCheck(c, signInParam)
 	c.Debug("登录")
 	c.Info("登录", logs.Desc("abc"))
-	if len(signInParam.UserName) == 0 {
+    if len(signInParam.UserName) == 0 {
         panic(errs.NewError(wrong.ErrLoginCode)) // 使用panic全局报错
     }
 	validated.SuccRes(c, &params.SignInRtn{
