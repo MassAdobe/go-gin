@@ -31,6 +31,7 @@ const (
 	ErrCopyPropertyCode                       // 实体类转换错误
 	ErrRequestTimeoutCode                     // 请求超时
 	ErrResponseStatusCode                     // 响应码错误
+	ErrGetIdempotentCode                      // 获取幂等token失败
 
 	/*error desc*/
 	SuccessDesc                        = "成功"
@@ -52,6 +53,7 @@ const (
 	ErrCopyPropertyDesc                = "实体类转换错误"
 	ErrRequestTimeoutDesc              = "请求超时"
 	ErrResponseStatusDesc              = "响应码错误"
+	ErrGetIdempotentDesc               = "获取幂等token失败"
 )
 
 /**
@@ -80,6 +82,7 @@ var CodeDescMap = map[int]string{
 	ErrCopyPropertyCode:                ErrCopyPropertyDesc,
 	ErrRequestTimeoutCode:              ErrRequestTimeoutDesc,
 	ErrResponseStatusCode:              ErrResponseStatusDesc,
+	ErrGetIdempotentCode:               ErrGetIdempotentDesc,
 }
 
 /**

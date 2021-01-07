@@ -44,7 +44,7 @@ func InitDB() {
 			nacos.InitConfiguration.Gorm.Read.Ip,
 			nacos.InitConfiguration.Gorm.Read.Port,
 			nacos.InitConfiguration.Gorm.Read.Dbname)); err != nil {
-			logs.Lg.Error("数据库连接", err, logs.Desc("读库连接失败"))
+			logs.Lg.SysError("数据库连接", err, logs.Desc("读库连接失败"))
 		} else {
 			gg.DB().SetMaxIdleConns(2)
 			gg.DB().SetMaxOpenConns(10)
@@ -53,10 +53,10 @@ func InitDB() {
 			logger := &DbLog{}
 			gg.SetLogger(logger)
 			if err := gg.DB().Ping(); err != nil {
-				logs.Lg.Error("数据库连接", err, logs.Desc("读库初始化失败"))
+				logs.Lg.SysError("数据库连接", err, logs.Desc("读库初始化失败"))
 				os.Exit(1)
 			} else {
-				logs.Lg.Info("数据库连接", logs.Desc("读库初始化成功"))
+				logs.Lg.SysInfo("数据库连接", logs.Desc("读库初始化成功"))
 				Read = gg
 			}
 		}
@@ -68,7 +68,7 @@ func InitDB() {
 			nacos.InitConfiguration.Gorm.Write.Ip,
 			nacos.InitConfiguration.Gorm.Write.Port,
 			nacos.InitConfiguration.Gorm.Write.Dbname)); err != nil {
-			logs.Lg.Error("数据库连接", err, logs.Desc("写库连接失败"))
+			logs.Lg.SysError("数据库连接", err, logs.Desc("写库连接失败"))
 		} else {
 			gg.DB().SetMaxIdleConns(2)
 			gg.DB().SetMaxOpenConns(10)
@@ -77,10 +77,10 @@ func InitDB() {
 			logger := &DbLog{}
 			gg.SetLogger(logger)
 			if err := gg.DB().Ping(); err != nil {
-				logs.Lg.Error("数据库连接", err, logs.Desc("写库初始化失败"))
+				logs.Lg.SysError("数据库连接", err, logs.Desc("写库初始化失败"))
 				os.Exit(1)
 			} else {
-				logs.Lg.Info("数据库连接", logs.Desc("写库初始化成功"))
+				logs.Lg.SysInfo("数据库连接", logs.Desc("写库初始化成功"))
 				Write = gg
 			}
 		}
@@ -97,20 +97,20 @@ func CloseDb() {
 	if len(nacos.InitConfiguration.Gorm.Read.Ip) != 0 {
 		if err := Read.Close(); err != nil {
 			mark = true
-			logs.Lg.Error("数据库连接", err, logs.Desc("关闭数据库读库连接池失败"))
+			logs.Lg.SysError("数据库连接", err, logs.Desc("关闭数据库读库连接池失败"))
 		}
 	}
 	if len(nacos.InitConfiguration.Gorm.Write.Ip) != 0 {
 		if err := Write.Close(); err != nil {
 			mark = true
-			logs.Lg.Error("数据库连接", err, logs.Desc("关闭数据库写库连接池失败"))
+			logs.Lg.SysError("数据库连接", err, logs.Desc("关闭数据库写库连接池失败"))
 		}
 	}
 	if mark {
 		return
 	}
 	if len(nacos.InitConfiguration.Gorm.Read.Ip) != 0 || len(nacos.InitConfiguration.Gorm.Write.Ip) != 0 {
-		logs.Lg.Info("数据库连接", logs.Desc("关闭数据库连接池成功"))
+		logs.Lg.SysInfo("数据库连接", logs.Desc("关闭数据库连接池成功"))
 	}
 }
 
@@ -129,7 +129,7 @@ type DbLog struct{}
 func (logger *DbLog) Print(values ...interface{}) {
 	switch values[0] {
 	case DB_SQL:
-		logs.Lg.Debug(
+		logs.Lg.SysDebug(
 			"数据库日志",
 			zap.Any("资源", values[1]),
 			zap.String("执行时间", fmt.Sprintf("%v", values[2])),
@@ -138,6 +138,6 @@ func (logger *DbLog) Print(values ...interface{}) {
 			zap.String("影响行数", fmt.Sprintf("%v", values[5])),
 		)
 	case DB_LOG:
-		logs.Lg.Debug("数据库日志", zap.Any("其他", values[2]))
+		logs.Lg.SysDebug("数据库日志", zap.Any("其他", values[2]))
 	}
 }

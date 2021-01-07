@@ -30,11 +30,11 @@ import (
  * @Description: 预热项
 **/
 func init() {
-	fmt.Println(fmt.Sprintf("【服务启动中...】"))
+	fmt.Println(fmt.Sprintf(`{"log_level":"INFO","time":"%s","msg":"%s","server_name":"%s","desc":"%s"}`, systemUtils.RtnCurTime(), "启动", "未知", "启动中"))
 	s, _ := systemUtils.RunInLinuxWithErr("pwd")     // 执行linux命令获取当前路径
 	sysData, _ := ioutil.ReadFile(s + "/config.yml") // 读取系统配置
 	if err := yaml.Unmarshal(sysData, &pojo.InitConf); err != nil {
-		fmt.Println(fmt.Sprintf("【MAIN】 %v %s", err, "解析系统配置失败"))
+		fmt.Println(fmt.Sprintf(`{"log_level":"INFO","time":"%s","msg":"%s","server_name":"%s","desc":"%s"}`, systemUtils.RtnCurTime(), "启动", "未知", "解析系统配置失败"))
 		os.Exit(1)
 	}
 	nacos.InitNacos()          // 初始化nacos配置
@@ -60,15 +60,15 @@ func GracefulShutdown(server *http.Server) {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGSTOP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGQUIT, os.Interrupt)
 	sig := <-quit
-	logs.Lg.Info("准备关闭", logs.SpecDesc("收到信号", sig))
+	logs.Lg.SysInfo("准备关闭", logs.SpecDesc("收到信号", sig))
 	now := time.Now()
 	cxt, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 	defer cancel()
 	if err := server.Shutdown(cxt); err != nil {
-		logs.Lg.Error("关闭失败", err)
+		logs.Lg.SysError("关闭失败", err)
 	}
 	nacos.NacosDeregister() // nacos注销服务
 	rds.CloseRds()          // 关闭Redis并释放句柄
 	db.CloseDb()            // 关停数据库连接池，释放句柄
-	logs.Lg.Info("退出成功", logs.Desc(fmt.Sprintf("退出花费时间: %v", time.Since(now))))
+	logs.Lg.SysInfo("退出成功", logs.Desc(fmt.Sprintf("退出花费时间: %v", time.Since(now))))
 }

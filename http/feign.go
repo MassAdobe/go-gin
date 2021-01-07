@@ -45,17 +45,17 @@ func (this *FeignRequest) FeignGet() (feign []byte, err error) {
 			}
 		}
 	}
-	this.C.Error("服务内部调用get请求", err, logs.Desc(fmt.Sprintf("超过设置调用次数: %d", nacos.InitConfiguration.Feign.RetryNum)))
+	this.C.SysError("服务内部调用get请求", err, logs.Desc(fmt.Sprintf("超过设置调用次数: %d", nacos.InitConfiguration.Feign.RetryNum)))
 	return
 }
 
 func getFeign(serviceName, groupName, url string, params interface{}, c *goContext.Context) ([]byte, error) {
 	if instance, err := nacos.NacosGetServer(serviceName, groupName); err != nil {
-		c.Error("服务内部调用get请求", err)
+		c.SysError("服务内部调用get请求", err)
 		panic(errs.NewError(errs.ErrInnerCallingCode, err))
 	} else {
 		if rtn, err := Get(fmt.Sprintf("%s:%d", instance.Ip, instance.Port), url, params, c.GinContext); err != nil {
-			c.Error("服务内部调用get请求", err)
+			c.SysError("服务内部调用get请求", err)
 			return nil, err
 		} else {
 			return rtn, nil
@@ -82,17 +82,17 @@ func (this *FeignRequest) FeignPost() (feign []byte, err error) {
 			}
 		}
 	}
-	this.C.Error("服务内部调用post请求", err, logs.Desc(fmt.Sprintf("超过设置调用次数: %d", nacos.InitConfiguration.Feign.RetryNum)))
+	this.C.SysError("服务内部调用post请求", err, logs.Desc(fmt.Sprintf("超过设置调用次数: %d", nacos.InitConfiguration.Feign.RetryNum)))
 	return
 }
 
 func postFeign(serviceName, groupName, url string, params interface{}, c *goContext.Context) ([]byte, error) {
 	if instance, err := nacos.NacosGetServer(serviceName, groupName); err != nil {
-		c.Error("服务内部调用post请求", err)
+		c.SysError("服务内部调用post请求", err)
 		panic(errs.NewError(errs.ErrInnerCallingCode, err))
 	} else {
 		if rtn, err := Post(fmt.Sprintf("%s:%d", instance.Ip, instance.Port), url, params, c.GinContext); err != nil {
-			c.Error("服务内部调用post请求", err)
+			c.SysError("服务内部调用post请求", err)
 			return nil, err
 		} else {
 			return rtn, nil
@@ -119,17 +119,17 @@ func (this *FeignRequest) FeignPut() (feign []byte, err error) {
 			}
 		}
 	}
-	this.C.Error("服务内部调用put请求", err, logs.Desc(fmt.Sprintf("超过设置调用次数: %d", nacos.InitConfiguration.Feign.RetryNum)))
+	this.C.SysError("服务内部调用put请求", err, logs.Desc(fmt.Sprintf("超过设置调用次数: %d", nacos.InitConfiguration.Feign.RetryNum)))
 	return
 }
 
 func putFeign(serviceName, groupName, url string, params interface{}, c *goContext.Context) ([]byte, error) {
 	if instance, err := nacos.NacosGetServer(serviceName, groupName); err != nil {
-		c.Error("服务内部调用put请求", err)
+		c.SysError("服务内部调用put请求", err)
 		panic(errs.NewError(errs.ErrInnerCallingCode, err))
 	} else {
 		if rtn, err := Put(fmt.Sprintf("%s:%d", instance.Ip, instance.Port), url, params, c.GinContext); err != nil {
-			c.Error("服务内部调用put请求", err)
+			c.SysError("服务内部调用put请求", err)
 			return nil, err
 		} else {
 			return rtn, nil
@@ -156,17 +156,17 @@ func (this *FeignRequest) FeignDelete() (feign []byte, err error) {
 			}
 		}
 	}
-	this.C.Error("服务内部调用delete请求", err, logs.Desc(fmt.Sprintf("超过设置调用次数: %d", nacos.InitConfiguration.Feign.RetryNum)))
+	this.C.SysError("服务内部调用delete请求", err, logs.Desc(fmt.Sprintf("超过设置调用次数: %d", nacos.InitConfiguration.Feign.RetryNum)))
 	return
 }
 
 func deleteFeign(serviceName, groupName, url string, params interface{}, c *goContext.Context) ([]byte, error) {
 	if instance, err := nacos.NacosGetServer(serviceName, groupName); err != nil {
-		c.Error("服务内部调用delete请求", err)
+		c.SysError("服务内部调用delete请求", err)
 		panic(errs.NewError(errs.ErrInnerCallingCode, err))
 	} else {
 		if rtn, err := Delete(fmt.Sprintf("%s:%d", instance.Ip, instance.Port), url, params, c.GinContext); err != nil {
-			c.Error("服务内部调用delete请求", err)
+			c.SysError("服务内部调用delete请求", err)
 			return nil, err
 		} else {
 			return rtn, nil

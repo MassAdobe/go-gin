@@ -20,7 +20,7 @@ import (
 **/
 func InitNacosProfile() {
 	if err := yaml.Unmarshal([]byte(NacosContent), &InitConfiguration); err != nil {
-		fmt.Println(fmt.Sprintf("【SYSTEM】%s %s %v %s", systemUtils.RtnCurTime(), "【nacos配置中心】", err, "读取nacos系统配置失败"))
+		fmt.Println(fmt.Sprintf(`{"log_level":"INFO","time":"%s","msg":"%s","server_name":"%s","desc":"%s"}`, systemUtils.RtnCurTime(), "配置中心", "未知", "读取nacos系统配置失败"))
 		os.Exit(1)
 	}
 }
@@ -32,7 +32,7 @@ func InitNacosProfile() {
 **/
 func ReadNacosProfile(content string) *InitNacosConfiguration {
 	if err := yaml.Unmarshal([]byte(content), &InitConfiguration); err != nil {
-		logs.Lg.Error("解析nacos配置", err, logs.Desc("解析nacos配置失败"))
+		logs.Lg.SysError("解析nacos配置", err, logs.Desc("解析nacos配置失败"))
 	}
 	return &InitConfiguration
 }
@@ -44,6 +44,6 @@ func ReadNacosProfile(content string) *InitNacosConfiguration {
 **/
 func ReadNacosSelfProfile(content string, pojo interface{}) {
 	if err := yaml.Unmarshal([]byte(content), pojo); err != nil {
-		logs.Lg.Error("解析nacos配置", err, logs.Desc("解析nacos自定义配置失败"))
+		logs.Lg.SysError("解析nacos配置", err, logs.Desc("解析nacos自定义配置失败"))
 	}
 }

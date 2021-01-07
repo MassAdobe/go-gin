@@ -32,7 +32,7 @@ func Get(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, err
 	client := http.Client{Timeout: constants.REQUEST_TIMEOUT_TM}
 	request, requestErr := http.NewRequest(http.MethodGet, fmt.Sprintf("http://%s%s", ipPort, url), nil)
 	if nil != requestErr {
-		logs.Lg.Error("Get请求", requestErr, c, logs.Desc(strings.NewReader(url)))
+		logs.Lg.SysError("Get请求", requestErr, c, logs.Desc(strings.NewReader(url)))
 		return nil, requestErr
 	}
 	request.Header.Add(constants.CONTENT_TYPE_KEY, constants.CONTENT_TYPE_INNER)
@@ -49,12 +49,12 @@ func Get(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, err
 	}
 	if resp, err = client.Do(request); err != nil {
 		defer resp.Body.Close()
-		logs.Lg.Error("Get请求", err, c, logs.Desc(strings.NewReader(url)))
+		logs.Lg.SysError("Get请求", err, c, logs.Desc(strings.NewReader(url)))
 		return nil, err
 	} else {
 		defer resp.Body.Close()
 		if body, err := ioutil.ReadAll(resp.Body); err != nil {
-			logs.Lg.Error("Get请求", err, c, logs.Desc(resp.Body))
+			logs.Lg.SysError("Get请求", err, c, logs.Desc(resp.Body))
 			return nil, err
 		} else {
 			return body, nil
@@ -75,7 +75,7 @@ func Post(ipPort, url, params interface{}, c ...*gin.Context) ([]byte, error) {
 	)
 	if nil != params { // 判断参数是否为空
 		if bytes, err := json.Marshal(params); err != nil {
-			logs.Lg.Error("Post请求", err)
+			logs.Lg.SysError("Post请求", err)
 			panic(errs.NewError(errs.ErrJsonCode))
 		} else {
 			req = string(bytes)
@@ -85,7 +85,7 @@ func Post(ipPort, url, params interface{}, c ...*gin.Context) ([]byte, error) {
 	requestUrl := fmt.Sprintf("http://%s%s", ipPort, url)
 	request, requestErr := http.NewRequest(http.MethodPost, requestUrl, strings.NewReader(req))
 	if nil != requestErr {
-		logs.Lg.Error("Post请求", requestErr, c, logs.Desc(strings.NewReader(requestUrl)))
+		logs.Lg.SysError("Post请求", requestErr, c, logs.Desc(strings.NewReader(requestUrl)))
 		return nil, requestErr
 	}
 	request.Header.Add(constants.CONTENT_TYPE_KEY, constants.CONTENT_TYPE_INNER)
@@ -102,12 +102,12 @@ func Post(ipPort, url, params interface{}, c ...*gin.Context) ([]byte, error) {
 	}
 	if resp, err = client.Do(request); err != nil {
 		defer resp.Body.Close()
-		logs.Lg.Error("Post请求", err, c, logs.Desc(req))
+		logs.Lg.SysError("Post请求", err, c, logs.Desc(req))
 		return nil, err
 	} else {
 		defer resp.Body.Close()
 		if body, err := ioutil.ReadAll(resp.Body); err != nil {
-			logs.Lg.Error("Post请求", err, c, logs.Desc(resp.Body))
+			logs.Lg.SysError("Post请求", err, c, logs.Desc(resp.Body))
 			return nil, err
 		} else {
 			return body, nil
@@ -124,7 +124,7 @@ func Put(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, err
 	url = url + urlEncode(params)
 	request, requestErr := http.NewRequest(http.MethodPut, fmt.Sprintf("http://%s%s", ipPort, url), nil)
 	if nil != requestErr {
-		logs.Lg.Error("Put请求", requestErr, c, logs.Desc(strings.NewReader(url)))
+		logs.Lg.SysError("Put请求", requestErr, c, logs.Desc(strings.NewReader(url)))
 		return nil, requestErr
 	}
 	request.Header.Add(constants.CONTENT_TYPE_KEY, constants.CONTENT_TYPE_INNER)
@@ -143,10 +143,10 @@ func Put(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, err
 	resp, err := client.Do(request)
 	defer resp.Body.Close()
 	if err != nil {
-		logs.Lg.Error("Put请求", err, c, logs.Desc(strings.NewReader(url)))
+		logs.Lg.SysError("Put请求", err, c, logs.Desc(strings.NewReader(url)))
 	}
 	if body, err := ioutil.ReadAll(resp.Body); err != nil {
-		logs.Lg.Error("Put请求", err, c, logs.Desc(strings.NewReader(url)))
+		logs.Lg.SysError("Put请求", err, c, logs.Desc(strings.NewReader(url)))
 		return nil, err
 	} else {
 		return body, nil
@@ -162,7 +162,7 @@ func Delete(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, 
 	url = url + urlEncode(params)
 	request, requestErr := http.NewRequest(http.MethodDelete, fmt.Sprintf("http://%s%s", ipPort, url), nil)
 	if nil != requestErr {
-		logs.Lg.Error("Delete请求", requestErr, c, logs.Desc(strings.NewReader(url)))
+		logs.Lg.SysError("Delete请求", requestErr, c, logs.Desc(strings.NewReader(url)))
 		return nil, requestErr
 	}
 	request.Header.Add(constants.CONTENT_TYPE_KEY, constants.CONTENT_TYPE_INNER)
@@ -181,10 +181,10 @@ func Delete(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, 
 	resp, err := client.Do(request)
 	defer resp.Body.Close()
 	if err != nil {
-		logs.Lg.Error("Delete请求", err, c, logs.Desc(strings.NewReader(url)))
+		logs.Lg.SysError("Delete请求", err, c, logs.Desc(strings.NewReader(url)))
 	}
 	if body, err := ioutil.ReadAll(resp.Body); err != nil {
-		logs.Lg.Error("Delete请求", err, c, logs.Desc(strings.NewReader(url)))
+		logs.Lg.SysError("Delete请求", err, c, logs.Desc(strings.NewReader(url)))
 		return nil, err
 	} else {
 		return body, err

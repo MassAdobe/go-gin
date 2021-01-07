@@ -196,10 +196,6 @@ func InitLogger(path, serveName, level string, port uint64) {
 **/
 func (this *MyLog) GlobalError(msg string, contextAndFields ...interface{}) {
 	fields := this.setTraceAndStep(contextAndFields...)
-	pc, file, line, _ := runtime.Caller(1)
-	f := runtime.FuncForPC(pc)
-	fields = append(fields, zap.Any("function", f.Name()))
-	fields = append(fields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
 	if ce := this.ZapLog.Check(zapcore.ErrorLevel, msg); ce != nil {
 		ce.Write(fields...)
 	}
@@ -224,6 +220,18 @@ func (this *MyLog) Debug(msg string, contextAndFields ...interface{}) {
 /**
  * @Author: MassAdobe
  * @TIME: 2020/12/17 7:52 下午
+ * @Description: 重写Debug日志级别输出(系统)
+**/
+func (this *MyLog) SysDebug(msg string, contextAndFields ...interface{}) {
+	fields := this.setTraceAndStep(contextAndFields...)
+	if ce := this.ZapLog.Check(zapcore.DebugLevel, msg); ce != nil {
+		ce.Write(fields...)
+	}
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2020/12/17 7:52 下午
  * @Description: 重写Info日志级别输出
 **/
 func (this *MyLog) Info(msg string, contextAndFields ...interface{}) {
@@ -232,6 +240,18 @@ func (this *MyLog) Info(msg string, contextAndFields ...interface{}) {
 	f := runtime.FuncForPC(pc)
 	fields = append(fields, zap.Any("function", f.Name()))
 	fields = append(fields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
+	if ce := this.ZapLog.Check(zapcore.InfoLevel, msg); ce != nil {
+		ce.Write(fields...)
+	}
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2020/12/17 7:52 下午
+ * @Description: 重写Info日志级别输出(系统)
+**/
+func (this *MyLog) SysInfo(msg string, contextAndFields ...interface{}) {
+	fields := this.setTraceAndStep(contextAndFields...)
 	if ce := this.ZapLog.Check(zapcore.InfoLevel, msg); ce != nil {
 		ce.Write(fields...)
 	}
@@ -249,6 +269,19 @@ func (this *MyLog) Error(msg string, err error, contextAndFields ...interface{})
 	fields = append(fields, Error(err))
 	fields = append(fields, zap.Any("function", f.Name()))
 	fields = append(fields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
+	if ce := this.ZapLog.Check(zapcore.ErrorLevel, msg); ce != nil {
+		ce.Write(fields...)
+	}
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2020/12/17 7:52 下午
+ * @Description: 重写Error日志级别输出(系统)
+**/
+func (this *MyLog) SysError(msg string, err error, contextAndFields ...interface{}) {
+	fields := this.setTraceAndStep(contextAndFields...)
+	fields = append(fields, Error(err))
 	if ce := this.ZapLog.Check(zapcore.ErrorLevel, msg); ce != nil {
 		ce.Write(fields...)
 	}

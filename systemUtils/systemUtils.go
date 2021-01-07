@@ -18,6 +18,7 @@ import (
 	"os"
 	"os/exec"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -112,6 +113,16 @@ func RandSeq(n int) string {
 
 /**
  * @Author: MassAdobe
+ * @TIME: 2021/1/7 11:35 上午
+ * @Description: 生成幂等token(保证64位长度)
+**/
+func RandIdempotentToken(userId int) string {
+	itoa := strconv.Itoa(userId)
+	return itoa + RandSeq(64-len(itoa))
+}
+
+/**
+ * @Author: MassAdobe
  * @TIME: 2020-05-29 21:47
  * @Description: 生成手机验证码
 **/
@@ -153,7 +164,7 @@ func GetIntranetIp() string {
 **/
 func Marshal(pojo interface{}) string {
 	if bytes, err := json.Marshal(pojo); err != nil {
-		logs.Lg.Error("结构体转JSON格式错误", err)
+		logs.Lg.SysError("结构体转JSON格式错误", err)
 		panic(errs.NewError(errs.ErrJsonCode))
 	} else {
 		return string(bytes)
@@ -257,7 +268,7 @@ func CopyProperty(dst, src interface{}) {
 	srcType, srcValue := reflect.TypeOf(src), reflect.ValueOf(src)
 	// dst必须结构体指针类型
 	if dstType.Kind() != reflect.Ptr || dstType.Elem().Kind() != reflect.Struct {
-		logs.Lg.Error("实体类转换", errors.New("dst type should be a struct pointer"))
+		logs.Lg.SysError("实体类转换", errors.New("dst type should be a struct pointer"))
 		panic(errs.NewError(errs.ErrCopyPropertyCode))
 	}
 	// src必须为结构体或者结构体指针
@@ -265,7 +276,7 @@ func CopyProperty(dst, src interface{}) {
 		srcType, srcValue = srcType.Elem(), srcValue.Elem()
 	}
 	if srcType.Kind() != reflect.Struct {
-		logs.Lg.Error("实体类转换", errors.New("src type should be a struct or a struct pointer"))
+		logs.Lg.SysError("实体类转换", errors.New("src type should be a struct or a struct pointer"))
 		panic(errs.NewError(errs.ErrCopyPropertyCode))
 	}
 	// 取具体内容

@@ -99,13 +99,13 @@ func checkConn() {
 	rc := Get()
 	defer rc.Close()
 	if reply, err := rc.Do(RDS_PING); err != nil {
-		logs.Lg.Error("Redis连接", err)
+		logs.Lg.SysError("Redis连接", err)
 		os.Exit(1)
 	} else if "PONG" != reply.(string) {
-		logs.Lg.Error("Redis连接", errors.New("Redis连接校验失败"))
+		logs.Lg.SysError("Redis连接", errors.New("redis connect failure"))
 		os.Exit(1)
 	} else {
-		logs.Lg.Info("Redis连接", logs.Desc("Redis连接成功"))
+		logs.Lg.SysInfo("Redis连接", logs.Desc("Redis连接成功"))
 	}
 }
 
@@ -126,9 +126,9 @@ func Get() redis.Conn {
 func CloseRds() {
 	if 0 != len(nacos.InitConfiguration.Redis.IpPort) {
 		if err := Redis.Close(); err != nil {
-			logs.Lg.Error("Redis连接", err)
+			logs.Lg.SysError("Redis连接", err)
 			return
 		}
-		logs.Lg.Info("Redis连接", logs.Desc("关闭Redis连接池成功"))
+		logs.Lg.SysInfo("Redis连接", logs.Desc("关闭Redis连接池成功"))
 	}
 }

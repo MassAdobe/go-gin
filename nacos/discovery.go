@@ -30,11 +30,11 @@ func NacosDiscovery() {
 			"clientConfig":  clientC,
 		})
 		if nil != namingClientErr {
-			logs.Lg.Error("nacos服务注册与发现", namingClientErr, logs.Desc("创建服务发现客户端失败"))
+			logs.Lg.SysError("nacos服务注册与发现", namingClientErr, logs.Desc("创建服务发现客户端失败"))
 			os.Exit(1)
 		}
 		if ip, err := systemUtils.ExternalIP(); err != nil {
-			logs.Lg.Error("nacos服务注册与发现", err, logs.Desc("nacos获取当前机器IP失败"))
+			logs.Lg.SysError("nacos服务注册与发现", err, logs.Desc("nacos获取当前机器IP失败"))
 			os.Exit(1)
 		} else {
 			pojo.CurIp = ip.String() // 赋值当前宿主IP
@@ -51,11 +51,11 @@ func NacosDiscovery() {
 				GroupName:   pojo.InitConf.NacosGroup, // 默认值DEFAULT_GROUP
 			})
 			if success && nil != namingErr {
-				logs.Lg.Error("nacos服务注册与发现", namingErr, logs.Desc("nacos注册服务失败"))
+				logs.Lg.SysError("nacos服务注册与发现", namingErr, logs.Desc("nacos注册服务失败"))
 				os.Exit(1)
 			}
 		}
-		logs.Lg.Info("nacos服务注册与发现", logs.Desc("服务注册成功"))
+		logs.Lg.SysInfo("nacos服务注册与发现", logs.Desc("服务注册成功"))
 	}
 }
 
@@ -75,10 +75,10 @@ func NacosDeregister() {
 			GroupName:   pojo.InitConf.NacosGroup, // 默认值DEFAULT_GROUP
 		})
 		if success && nil != err {
-			logs.Lg.Error("nacos服务注册与发现", err, logs.Desc("nacos注销服务失败"))
+			logs.Lg.SysError("nacos服务注册与发现", err, logs.Desc("nacos注销服务失败"))
 			os.Exit(1)
 		}
-		logs.Lg.Info("nacos服务注册与发现", logs.Desc("nacos服务注销成功"))
+		logs.Lg.SysInfo("nacos服务注册与发现", logs.Desc("nacos服务注销成功"))
 	}
 }
 

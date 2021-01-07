@@ -167,7 +167,7 @@ func init() {
 ### 使用配置内容
 ```go
 	// 返回信息
-	validated.SuccRes(c, &params.SignInRtn{
+	c.SuccRes(&params.SignInRtn{
 		UserName:        signInParam.UserName,
 		PassWord:        signInParam.PassWord,
 		Timestamp:       signInParam.Timestamp,
@@ -208,7 +208,7 @@ func init() {
 ```
 ### 业务使用
 ```go
-func SignIn(c *context.Context) {
+func SignIn(c *goContext.Context) {
 	signInParam := new(params.SignInParam)
 	validated.BindAndCheck(c, signInParam)
 	c.Debug("登录")
@@ -216,7 +216,7 @@ func SignIn(c *context.Context) {
     if len(signInParam.UserName) == 0 {
         panic(errs.NewError(wrong.ErrLoginCode)) // 使用panic全局报错
     }
-	validated.SuccRes(c, &params.SignInRtn{
+	c.SuccRes(&params.SignInRtn{
 		UserName:        signInParam.UserName,
 		PassWord:        signInParam.PassWord,
 		Timestamp:       signInParam.Timestamp,

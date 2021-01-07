@@ -130,7 +130,7 @@ func Timeout(t time.Duration) gin.HandlerFunc {
 		}()
 		select {
 		case p := <-panicChan:
-			logs.Lg.Error("请求超时", errors.New(fmt.Sprintf("%v", p)), c)
+			logs.Lg.SysError("请求超时", errors.New(fmt.Sprintf("%v", p)), c)
 			panic(errs.NewError(errs.ErrSystemCode))
 		case <-ctx.Done():
 			// 如果超时的话，buffer无法主动清除，只能等待GC回收
@@ -147,7 +147,7 @@ func Timeout(t time.Duration) gin.HandlerFunc {
 			c.Abort()
 			cancel()
 			tw.timedOut = true
-			logs.Lg.Error("请求超时", errors.New("request timeout error"), c)
+			logs.Lg.SysError("请求超时", errors.New("request timeout error"), c)
 		case <-finish:
 			tw.mu.Lock()
 			defer tw.mu.Unlock()
