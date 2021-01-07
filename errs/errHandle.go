@@ -130,7 +130,12 @@ func ErrHandler() gin.HandlerFunc {
 				}
 				logs.Lg.GlobalError("响应日志", c, logs.Desc("错误"), logs.BasicError(err))
 				c.JSON(Err.StatusCode, Err)
-				return
+				if c.IsAborted() {
+					return
+				}
+				if finish, exists := c.Get("finish"); c.IsAborted() && exists {
+					finish.(chan bool) <- true
+				}
 			}
 		}()
 		c.Next()

@@ -29,6 +29,7 @@
 >> + 业务报错适配器；
 >> + 请求超时处理，统一配置预设值，提前返回超时设置；
 >> + 根据配置环境不同，加载方式变更（开发环境没有超时设定，支撑Debug）;
+>> + 增加基于redis + token的幂等接口处理；
 
 ---
 
@@ -227,6 +228,54 @@ func SignIn(c *goContext.Context) {
 }
 ```
 
+---
+
+## 幂等使用
+#### 需要使用幂等时，需要确保宿主程序有redis配置，并且可以连接；
+### 逻辑：
+![idempotent](./doc/idempotent.png)
+### 使用方式：
++ 所有的前端幂等请求需要提前访问http://ip:port/other/idempotentToken接口
++ 返回：
+```json
+{
+    "code": 0,
+    "msg": "成功",
+    "data": "1M7G6QKMlVpaDGv8oHZAYCO06p4epZdIssPt7wk4PgVP2OCfxHUiPfidGYf1h1d8"
+}
+```
++ 其中data值为token，在调用幂等接口时需要在http头部增加token值，例如：
++ header `key: idempotent;   value: 1M7G6QKMlVpaDGv8oHZAYCO06p4epZdIssPt7wk4PgVP2OCfxHUiPfidGYf1h1d8`
+#### 幂等路由
+```go
+func Routers() (rtr *gin.Engine) {
+    rtr = routers.NewRouter()
+    // 示例接口
+    idempotent := rtr.Group(nacos.RequestPath("idempotent").Use(filter.SetTraceAndStep())
+    {
+        login.POST("/testIdempotent", filter.GetReqUser(), filter.ValidIdempotent(),
+        goContext.Handle(controller.TestIdempotent)) // 测试幂等接口
+    }
+    return
+}
+```
+其中
++ `filter.GetReqUser()`是校验用户信息的插件，必须存在；
++ `filter.ValidIdempotent()`是校验幂等要素的插件，必须存在；
+#### 幂等接口
+```go
+/**
+ * @Description: 测试幂等接口(正常写接口即可)
+**/
+func TestIdempotent(c *goContext.Context) {
+	testIdempotentParam := new(params.TestIdempotentParam)
+	validated.BindAndCheck(c, testIdempotentParam)
+	c.SuccRes(&params.TestIdempotentParamRtn{
+		String: testIdempotentParam.TestString,
+		Int:    testIdempotentParam.TestInt,
+	})
+}
+```
 ---
 
 >## 未做功能

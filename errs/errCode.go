@@ -32,6 +32,9 @@ const (
 	ErrRequestTimeoutCode                     // 请求超时
 	ErrResponseStatusCode                     // 响应码错误
 	ErrGetIdempotentCode                      // 获取幂等token失败
+	ErrValidIdempotentCode                    // 校验幂等性失败
+	ErrValidIdempotentRepeatCode              // 接口重复提交
+	ErrValidIdempotentHeaderCode              // 接口调用非法
 
 	/*error desc*/
 	SuccessDesc                        = "成功"
@@ -54,6 +57,9 @@ const (
 	ErrRequestTimeoutDesc              = "请求超时"
 	ErrResponseStatusDesc              = "响应码错误"
 	ErrGetIdempotentDesc               = "获取幂等token失败"
+	ErrValidIdempotentDesc             = "校验幂等性失败"
+	ErrValidIdempotentRepeatDesc       = "接口重复提交"
+	ErrValidIdempotentHeaderDesc       = "接口调用非法"
 )
 
 /**
@@ -83,6 +89,9 @@ var CodeDescMap = map[int]string{
 	ErrRequestTimeoutCode:              ErrRequestTimeoutDesc,
 	ErrResponseStatusCode:              ErrResponseStatusDesc,
 	ErrGetIdempotentCode:               ErrGetIdempotentDesc,
+	ErrValidIdempotentCode:             ErrValidIdempotentDesc,
+	ErrValidIdempotentRepeatCode:       ErrValidIdempotentRepeatDesc,
+	ErrValidIdempotentHeaderCode:       ErrValidIdempotentHeaderDesc,
 }
 
 /**

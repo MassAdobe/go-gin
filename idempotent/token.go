@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	TOKEN_EXPIRE_TIME = 360 // 幂等token有效时间(s)
+	TOKEN_EXPIRE_TIME = 3600 // 幂等token有效时间(s)
 )
 
 /**

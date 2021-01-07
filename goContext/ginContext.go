@@ -6,7 +6,9 @@
 package goContext
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/errs"
@@ -18,13 +20,28 @@ import (
 	"net/http"
 	"net/url"
 	"runtime"
+	"strings"
 )
 
+const (
+	GO_CONTEXT_ENV_DEBUG = "debug"
+)
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2021/1/7 5:29 下午
+ * @Description: 自适应context
+**/
 type Context struct {
 	GinContext *gin.Context
 	GinLog     *logs.MyLog
 }
 
+/**
+ * @Author: MassAdobe
+ * @TIME: 2021/1/7 5:29 下午
+ * @Description: 嵌套方法体
+**/
 type HandlerFunc func(c *Context)
 
 /**
@@ -34,7 +51,27 @@ type HandlerFunc func(c *Context)
 **/
 func Handle(handle HandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		handle(&Context{c, &logs.Lg})
+		if strings.ToLower(pojo.InitConf.ProgramEnv) == GO_CONTEXT_ENV_DEBUG {
+			handle(&Context{c, &logs.Lg})
+		} else {
+			timeout, cancel := context.WithTimeout(c.Request.Context(), constants.REQUEST_TIMEOUT_TM)
+			c.Request.WithContext(timeout)
+			finishChan := make(chan bool)
+			c.Set("finish", finishChan)
+			go handle(&Context{c, &logs.Lg})
+			select {
+			case <-timeout.Done():
+				c.Abort()
+				cancel()
+				close(finishChan)
+				logs.Lg.SysError("请求超时", errors.New("request timeout error"), c)
+				panic(errs.NewError(errs.ErrRequestTimeoutCode))
+			case <-finishChan:
+				cancel()
+				close(finishChan)
+				return
+			}
+		}
 	}
 }
 
@@ -216,11 +253,17 @@ func res(code int, data interface{}) (rtn *Response) {
  * @Description: 成功时返回 支持data为空
 **/
 func (this *Context) SuccRes(data interface{}) {
+	if this.GinContext.IsAborted() {
+		return
+	}
 	this.SysInfo("响应日志",
 		logs.SpecDesc("请求方法", this.GinContext.Request.Method),
 		logs.SpecDesc("请求路径", this.GinContext.Request.URL),
 		logs.SpecDesc("响应体", data))
 	this.GinContext.JSON(http.StatusOK, res(errs.SuccessCode, data))
+	if finish, exists := this.GinContext.Get("finish"); exists {
+		finish.(chan bool) <- true
+	}
 }
 
 /**
@@ -229,11 +272,17 @@ func (this *Context) SuccRes(data interface{}) {
  * @Description: 错误时返回 支持data为空
 **/
 func (this *Context) FailRes(errCode int, data interface{}) {
+	if this.GinContext.IsAborted() {
+		return
+	}
 	this.SysInfo("响应日志",
 		logs.SpecDesc("请求方法", this.GinContext.Request.Method),
 		logs.SpecDesc("请求路径", this.GinContext.Request.URL),
 		logs.SpecDesc("响应体", data))
 	this.GinContext.JSON(http.StatusOK, res(errCode, data))
+	if finish, exists := this.GinContext.Get("finish"); this.GinContext.IsAborted() && exists {
+		finish.(chan bool) <- true
+	}
 }
 
 /**
@@ -242,9 +291,15 @@ func (this *Context) FailRes(errCode int, data interface{}) {
  * @Description: 内部调用 成功时返回 支持data为空
 **/
 func (this *Context) SuccResFeign(data interface{}) {
+	if this.GinContext.IsAborted() {
+		return
+	}
 	this.SysInfo("响应日志",
 		logs.SpecDesc("请求方法", this.GinContext.Request.Method),
 		logs.SpecDesc("请求路径", this.GinContext.Request.URL),
 		logs.SpecDesc("响应体", data))
 	this.GinContext.JSON(http.StatusOK, data)
+	if finish, exists := this.GinContext.Get("finish"); this.GinContext.IsAborted() && exists {
+		finish.(chan bool) <- true
+	}
 }

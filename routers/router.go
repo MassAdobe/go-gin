@@ -6,7 +6,6 @@
 package routers
 
 import (
-	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/errs"
 	"github.com/MassAdobe/go-gin/filter"
 	"github.com/MassAdobe/go-gin/goContext"
@@ -45,12 +44,9 @@ func NewRouter() (rtr *gin.Engine) {
 	rtr.NoMethod(errs.HandleNotFound) // 处理没有相关方法时的错误处理
 	rtr.NoRoute(errs.HandleNotFound)  // 处理没有相关路由时的错误处理
 	rtr.Use(errs.ErrHandler())        // 全局错误处理
-	if gin.Mode() != gin.DebugMode {
-		rtr.Use(filter.Timeout(constants.REQUEST_TIMEOUT_TM)) // 增加处理超时请求
-	}
 	other := rtr.Group("other").Use(filter.SetTraceAndStep()).Use(filter.GetReqUser())
 	{
-		// 保证幂等 必须存在
+		// 保证幂等 必须存在redis接入
 		if len(nacos.InitConfiguration.Redis.IpPort) != 0 {
 			other.GET("idempotentToken", goContext.Handle(idempotent.GetToken)) // 幂等获取token
 		}
