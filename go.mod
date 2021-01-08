@@ -11,10 +11,15 @@ require (
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/jinzhu/gorm v1.9.16
+	github.com/json-iterator/go v1.1.10 // indirect
+	github.com/kr/pretty v0.2.1 // indirect
+	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/nacos-group/nacos-sdk-go v1.0.3
 	github.com/natefinch/lumberjack v2.0.0+incompatible
-	github.com/vearne/golib v0.0.6
+	go.uber.org/ratelimit v0.1.0
 	go.uber.org/zap v1.16.0
+	golang.org/x/net v0.0.0-20200602114024-627f9648deb9 // indirect
+	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )

@@ -47,7 +47,7 @@ type HandlerFunc func(c *Context)
 /**
  * @Author: MassAdobe
  * @TIME: 2021/1/6 10:03 上午
- * @Description: 处理日志与gin框架合并
+ * @Description: 处理日志与gin框架合并 处理超时问题
 **/
 func Handle(handle HandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {

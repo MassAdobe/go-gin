@@ -58,6 +58,11 @@ type InitNacosConfiguration struct {
 		ReadTimeout    int    `yaml:"read-timeout"`    // 读超时时间（秒）
 		WriteTimeout   int    `yaml:"write-timeout"`   // 写超时时间（秒）
 	} `yaml:"redis"`
+	Rate struct { // 限流（漏斗）
+		All              bool           `yaml:"all"`                // 是否是全局
+		Rate             int            `yaml:"rate"`               // 限流数量
+		InterfaceAndRate map[string]int `yaml:"interface-and-rate"` // 限流接口以及限流数
+	} `yaml:"rate"`
 }
 
 /**

@@ -16,23 +16,33 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/clients/naming_client"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/vo"
+	"go.uber.org/ratelimit"
 	"go.uber.org/zap"
 	"os"
 	"strings"
 )
 
 var (
-	serverCs        []constant.ServerConfig     // nacos的server配置
-	clientC         constant.ClientConfig       // nacos的client配置
-	profileC        vo.ConfigParam              // nacos的配置
-	configClient    config_client.IConfigClient // nacos服务配置中心client
-	namingClient    naming_client.INamingClient // nacos服务注册与发现client
-	NacosContent    string                      // nacos配置中心配置内容
-	NacosRegistPojo map[int]interface{}         // nacos注册的自主配置结构体
+	serverCs        []constant.ServerConfig      // nacos的server配置
+	clientC         constant.ClientConfig        // nacos的client配置
+	profileC        vo.ConfigParam               // nacos的配置
+	configClient    config_client.IConfigClient  // nacos服务配置中心client
+	namingClient    naming_client.INamingClient  // nacos服务注册与发现client
+	NacosContent    string                       // nacos配置中心配置内容
+	NacosRegistPojo map[int]interface{}          // nacos注册的自主配置结构体
+	RateMap         map[string]ratelimit.Limiter // 限流Map
+	PastRateMap     map[string]int               // 历史限流Map
 )
 
+/**
+ * @Author: MassAdobe
+ * @TIME: 2021/1/8 1:24 下午
+ * @Description: 初始化需要初始化的参数
+**/
 func init() {
-	NacosRegistPojo = make(map[int]interface{})
+	NacosRegistPojo = make(map[int]interface{})  // nacos注册的自主配置结构体
+	RateMap = make(map[string]ratelimit.Limiter) // 限流Map
+	PastRateMap = make(map[string]int)           // 历史限流Map
 }
 
 /**
@@ -166,6 +176,8 @@ func ListenConfiguration() {
 				for _, v := range NacosRegistPojo {
 					ReadNacosSelfProfile(data, v)
 				}
+				// 读取限流配置
+				ReadRateProfile(profile)
 			},
 		})
 		if err != nil {

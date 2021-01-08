@@ -44,6 +44,7 @@ func NewRouter() (rtr *gin.Engine) {
 	rtr.NoMethod(errs.HandleNotFound) // 处理没有相关方法时的错误处理
 	rtr.NoRoute(errs.HandleNotFound)  // 处理没有相关路由时的错误处理
 	rtr.Use(errs.ErrHandler())        // 全局错误处理
+	rtr.Use(filter.RateLimit())       // 全局处理限流
 	other := rtr.Group("other").Use(filter.SetTraceAndStep()).Use(filter.GetReqUser())
 	{
 		// 保证幂等 必须存在redis接入

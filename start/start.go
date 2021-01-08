@@ -40,6 +40,7 @@ func init() {
 	nacos.InitNacos()          // 初始化nacos配置
 	nacos.NacosConfiguration() // nacos配置中心
 	nacos.InitNacosProfile()   // 处理首次nacos获取到的配置信息
+	nacos.InitRateProfile()    // 初始化限流配置
 	logs.InitLogger(nacos.InitConfiguration.Log.Path,
 		nacos.InitConfiguration.Serve.ServerName,
 		nacos.InitConfiguration.Log.Level,
