@@ -52,21 +52,26 @@ type HandlerFunc func(c *Context)
 func Handle(handle HandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if strings.ToLower(pojo.InitConf.ProgramEnv) == GO_CONTEXT_ENV_DEBUG {
+			logs.Lg.SysDebug("中间件-超时", c, "当前环境为开发环境，默认取消超时设置")
 			handle(&Context{c, &logs.Lg})
 		} else {
+			logs.Lg.SysDebug("中间件-超时", c, "当前环境为非开发环境，默认开启超时设置")
 			timeout, cancel := context.WithTimeout(c.Request.Context(), constants.REQUEST_TIMEOUT_TM)
 			c.Request.WithContext(timeout)
 			finishChan := make(chan bool)
 			c.Set("finish", finishChan)
+			logs.Lg.SysDebug("中间件-超时", c, "协程处理业务接口函数")
 			go handle(&Context{c, &logs.Lg})
 			select {
 			case <-timeout.Done():
+				logs.Lg.SysDebug("中间件-超时", c, "收到业务超时信号")
 				c.Abort()
 				cancel()
 				close(finishChan)
 				logs.Lg.SysError("请求超时", errors.New("request timeout error"), c)
 				panic(errs.NewError(errs.ErrRequestTimeoutCode))
 			case <-finishChan:
+				logs.Lg.SysDebug("中间件-超时", c, "收到业务正常结束信号")
 				cancel()
 				close(finishChan)
 				return
@@ -92,9 +97,11 @@ func (this *Context) GetRequestUser() *pojo.RequestUser {
 				this.SysError("解析头中用户信息JSON错误", err)
 				panic(errs.NewError(errs.ErrHeaderUserCode, err))
 			}
+			this.Debug("获取用户基本信息", logs.Desc(fmt.Sprintf("用户ID：%d", requestUser.UserId)))
 			return requestUser
 		}
 	}
+	this.Debug("获取用户基本信息", logs.Desc("用户信息不存在"))
 	return nil
 }
 
@@ -112,6 +119,21 @@ func (this *Context) Debug(msg string, fields ...zap.Field) {
 	f := runtime.FuncForPC(pc)
 	newFields = append(newFields, zap.Any("function", f.Name()))
 	newFields = append(newFields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
+	if ce := this.GinLog.ZapLog.Check(zapcore.DebugLevel, msg); ce != nil {
+		ce.Write(newFields...)
+	}
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2020/12/17 7:52 下午
+ * @Description: 重写Debug日志级别输出(系统)
+**/
+func (this *Context) SysDebug(msg string, fields ...zap.Field) {
+	newFields := this.setTraceAndStep()
+	if len(fields) > 0 {
+		newFields = append(newFields, fields...)
+	}
 	if ce := this.GinLog.ZapLog.Check(zapcore.DebugLevel, msg); ce != nil {
 		ce.Write(newFields...)
 	}
@@ -263,6 +285,7 @@ func (this *Context) SuccRes(data interface{}) {
 	this.GinContext.JSON(http.StatusOK, res(errs.SuccessCode, data))
 	if finish, exists := this.GinContext.Get("finish"); exists {
 		finish.(chan bool) <- true
+		this.Debug("成功返回", logs.Desc("当前接口正常结束，发送正常结束信号"))
 	}
 }
 
@@ -282,6 +305,7 @@ func (this *Context) FailRes(errCode int, data interface{}) {
 	this.GinContext.JSON(http.StatusOK, res(errCode, data))
 	if finish, exists := this.GinContext.Get("finish"); this.GinContext.IsAborted() && exists {
 		finish.(chan bool) <- true
+		this.Debug("错误返回", logs.Desc("当前接口正常结束，发送正常结束信号"))
 	}
 }
 
@@ -301,5 +325,6 @@ func (this *Context) SuccResFeign(data interface{}) {
 	this.GinContext.JSON(http.StatusOK, data)
 	if finish, exists := this.GinContext.Get("finish"); this.GinContext.IsAborted() && exists {
 		finish.(chan bool) <- true
+		this.Debug("内部调用成功返回", logs.Desc("当前接口正常结束，发送正常结束信号"))
 	}
 }

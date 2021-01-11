@@ -55,7 +55,9 @@ const (
 **/
 func InitRds() {
 	if 0 != len(nacos.InitConfiguration.Redis.IpPort) {
+		logs.Lg.SysDebug("Redis连接", logs.Desc("当前nacos配置了redis"))
 		if 0 != len(nacos.InitConfiguration.Redis.PassWord) {
+			logs.Lg.SysDebug("Redis连接", logs.Desc("当前redis使用密码配置"))
 			Redis = &redis.Pool{
 				MaxIdle:     nacos.InitConfiguration.Redis.MaxIdle,
 				MaxActive:   nacos.InitConfiguration.Redis.MaxActive,
@@ -73,6 +75,7 @@ func InitRds() {
 			checkConn() // 校验是否成功连接
 			return
 		}
+		logs.Lg.SysDebug("Redis连接", logs.Desc("当前redis使用无密码配置"))
 		Redis = &redis.Pool{
 			MaxIdle:     nacos.InitConfiguration.Redis.MaxIdle,
 			MaxActive:   nacos.InitConfiguration.Redis.MaxActive,
@@ -96,6 +99,7 @@ func InitRds() {
  * @Description: 校验是否成功连接
 **/
 func checkConn() {
+	logs.Lg.Debug("Redis连接", logs.Desc("检验redis连接是否成功"))
 	rc := Get()
 	defer rc.Close()
 	if reply, err := rc.Do(RDS_PING); err != nil {
@@ -105,7 +109,7 @@ func checkConn() {
 		logs.Lg.SysError("Redis连接", errors.New("redis connect failure"))
 		os.Exit(1)
 	} else {
-		logs.Lg.SysInfo("Redis连接", logs.Desc("Redis连接成功"))
+		logs.Lg.SysDebug("Redis连接", logs.Desc("Redis连接成功"))
 	}
 }
 
@@ -115,6 +119,7 @@ func checkConn() {
  * @Description: 获取redis的连接
 **/
 func Get() redis.Conn {
+	logs.Lg.Debug("Redis连接", logs.Desc("从连接池中获取redis连接"))
 	return Redis.Get()
 }
 
@@ -129,6 +134,6 @@ func CloseRds() {
 			logs.Lg.SysError("Redis连接", err)
 			return
 		}
-		logs.Lg.SysInfo("Redis连接", logs.Desc("关闭Redis连接池成功"))
+		logs.Lg.SysDebug("Redis连接", logs.Desc("关闭redis连接池成功"))
 	}
 }

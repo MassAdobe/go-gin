@@ -56,7 +56,7 @@ func InitDB() {
 				logs.Lg.SysError("数据库连接", err, logs.Desc("读库初始化失败"))
 				os.Exit(1)
 			} else {
-				logs.Lg.SysInfo("数据库连接", logs.Desc("读库初始化成功"))
+				logs.Lg.SysDebug("数据库连接", logs.Desc("读库初始化成功"))
 				Read = gg
 			}
 		}
@@ -80,7 +80,7 @@ func InitDB() {
 				logs.Lg.SysError("数据库连接", err, logs.Desc("写库初始化失败"))
 				os.Exit(1)
 			} else {
-				logs.Lg.SysInfo("数据库连接", logs.Desc("写库初始化成功"))
+				logs.Lg.SysDebug("数据库连接", logs.Desc("写库初始化成功"))
 				Write = gg
 			}
 		}
@@ -110,7 +110,7 @@ func CloseDb() {
 		return
 	}
 	if len(nacos.InitConfiguration.Gorm.Read.Ip) != 0 || len(nacos.InitConfiguration.Gorm.Write.Ip) != 0 {
-		logs.Lg.SysInfo("数据库连接", logs.Desc("关闭数据库连接池成功"))
+		logs.Lg.SysDebug("数据库连接", logs.Desc("关闭数据库连接池成功"))
 	}
 }
 

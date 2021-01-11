@@ -6,6 +6,7 @@
 package nacos
 
 import (
+	"fmt"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/pojo"
 	"github.com/MassAdobe/go-gin/systemUtils"
@@ -33,6 +34,7 @@ func NacosDiscovery() {
 			logs.Lg.SysError("nacos服务注册与发现", namingClientErr, logs.Desc("创建服务发现客户端失败"))
 			os.Exit(1)
 		}
+		logs.Lg.Debug("nacos服务注册与发现", logs.Desc("创建服务发现客户端成功"))
 		if ip, err := systemUtils.ExternalIP(); err != nil {
 			logs.Lg.SysError("nacos服务注册与发现", err, logs.Desc("nacos获取当前机器IP失败"))
 			os.Exit(1)
@@ -50,12 +52,12 @@ func NacosDiscovery() {
 				ClusterName: "DEFAULT",                // 默认值DEFAULT
 				GroupName:   pojo.InitConf.NacosGroup, // 默认值DEFAULT_GROUP
 			})
-			if success && nil != namingErr {
+			if !success || nil != namingErr {
 				logs.Lg.SysError("nacos服务注册与发现", namingErr, logs.Desc("nacos注册服务失败"))
 				os.Exit(1)
 			}
 		}
-		logs.Lg.SysInfo("nacos服务注册与发现", logs.Desc("服务注册成功"))
+		logs.Lg.SysDebug("nacos服务注册与发现", logs.Desc("服务注册成功"))
 	}
 }
 
@@ -74,11 +76,11 @@ func NacosDeregister() {
 			Cluster:     "DEFAULT",                // 默认值DEFAULT
 			GroupName:   pojo.InitConf.NacosGroup, // 默认值DEFAULT_GROUP
 		})
-		if success && nil != err {
+		if !success || nil != err {
 			logs.Lg.SysError("nacos服务注册与发现", err, logs.Desc("nacos注销服务失败"))
 			os.Exit(1)
 		}
-		logs.Lg.SysInfo("nacos服务注册与发现", logs.Desc("nacos服务注销成功"))
+		logs.Lg.SysDebug("nacos服务注册与发现", logs.Desc("nacos服务注销成功"))
 	}
 }
 
@@ -94,8 +96,10 @@ func NacosGetServer(serviceName, groupName string) (instance *model.Instance, er
 		Clusters:    []string{"DEFAULT"}, // 默认值DEFAULT
 	})
 	if err != nil {
+		logs.Lg.SysError("nacos服务注册与发现", err, logs.Desc("获取服务失败"))
 		instance = nil
 		return
 	}
+	logs.Lg.SysDebug("nacos服务注册与发现", logs.Desc(fmt.Sprintf("获取服务成功: %v", instance)))
 	return
 }

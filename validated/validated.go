@@ -8,6 +8,7 @@ package validated
 import (
 	"bytes"
 	"github.com/MassAdobe/go-gin/errs"
+	"github.com/MassAdobe/go-gin/logs"
 	valid "github.com/go-playground/locales/zh"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
@@ -54,6 +55,7 @@ func InitValidator() {
 	}
 	GlobalValidator.Validate = validate
 	GlobalValidator.Trans = trans
+	logs.Lg.SysDebug("验证器", logs.Desc("初始化验证器成功"))
 }
 
 /**

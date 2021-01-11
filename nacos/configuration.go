@@ -146,6 +146,7 @@ func ListenConfiguration() {
 				// 修改日志级别
 				profile := ReadNacosProfile(data)
 				if strings.ToLower(pojo.InitConf.LogLevel) != strings.ToLower(profile.Log.Level) {
+					logs.Lg.SysDebug("nacos配置文件监听", logs.Desc("日志级别修改"))
 					switch strings.ToLower(profile.Log.Level) {
 					case "debug":
 						logs.Lg.Level.SetLevel(zap.DebugLevel)
@@ -184,7 +185,7 @@ func ListenConfiguration() {
 			logs.Lg.SysError("nacos配置文件监听", err, logs.Desc("设置nacos配置文件监听器失败"))
 			os.Exit(1)
 		}
-		logs.Lg.SysInfo("nacos配置文件监听", logs.Desc("设置nacos配置文件监听器成功"))
+		logs.Lg.SysDebug("nacos配置文件监听", logs.Desc("设置nacos配置文件监听器成功"))
 	}
 }
 

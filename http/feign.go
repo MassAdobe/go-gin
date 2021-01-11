@@ -35,12 +35,13 @@ func (this *FeignRequest) FeignGet() (feign []byte, err error) {
 	if 0 == nacos.InitConfiguration.Feign.RetryNum {
 		if feign, err = getFeign(this.ServerName, this.GroupName, this.Url, this.Body, this.C); err != nil {
 			panic(errs.NewError(errs.ErrGetRequestCode, err))
-		} else {
-			return
 		}
+		return
 	} else {
 		for i := 0; i < nacos.InitConfiguration.Feign.RetryNum; i++ {
-			if feign, err = getFeign(this.ServerName, this.GroupName, this.Url, this.Body, this.C); err == nil {
+			if feign, err = getFeign(this.ServerName, this.GroupName, this.Url, this.Body, this.C); err != nil {
+				this.C.SysError("服务内部调用get请求", err, logs.Desc(fmt.Sprintf("内部调用第%d次失败", i+1)))
+			} else {
 				return
 			}
 		}
@@ -58,6 +59,7 @@ func getFeign(serviceName, groupName, url string, params interface{}, c *goConte
 			c.SysError("服务内部调用get请求", err)
 			return nil, err
 		} else {
+			c.SysDebug("服务内部调用get请求", logs.Desc("内部调用返回成功"))
 			return rtn, nil
 		}
 	}
@@ -77,7 +79,9 @@ func (this *FeignRequest) FeignPost() (feign []byte, err error) {
 		}
 	} else {
 		for i := 0; i < nacos.InitConfiguration.Feign.RetryNum; i++ {
-			if feign, err = postFeign(this.ServerName, this.GroupName, this.Url, this.Body, this.C); err == nil {
+			if feign, err = postFeign(this.ServerName, this.GroupName, this.Url, this.Body, this.C); err != nil {
+				this.C.SysError("服务内部调用post请求", err, logs.Desc(fmt.Sprintf("内部调用第%d次失败", i+1)))
+			} else {
 				return
 			}
 		}
@@ -95,6 +99,7 @@ func postFeign(serviceName, groupName, url string, params interface{}, c *goCont
 			c.SysError("服务内部调用post请求", err)
 			return nil, err
 		} else {
+			c.SysDebug("服务内部调用post请求", logs.Desc("内部调用返回成功"))
 			return rtn, nil
 		}
 	}
@@ -114,7 +119,9 @@ func (this *FeignRequest) FeignPut() (feign []byte, err error) {
 		}
 	} else {
 		for i := 0; i < nacos.InitConfiguration.Feign.RetryNum; i++ {
-			if feign, err = putFeign(this.ServerName, this.GroupName, this.Url, this.Body, this.C); err == nil {
+			if feign, err = putFeign(this.ServerName, this.GroupName, this.Url, this.Body, this.C); err != nil {
+				this.C.SysError("服务内部调用put请求", err, logs.Desc(fmt.Sprintf("内部调用第%d次失败", i+1)))
+			} else {
 				return
 			}
 		}
@@ -132,6 +139,7 @@ func putFeign(serviceName, groupName, url string, params interface{}, c *goConte
 			c.SysError("服务内部调用put请求", err)
 			return nil, err
 		} else {
+			c.SysDebug("服务内部调用put请求", logs.Desc("内部调用返回成功"))
 			return rtn, nil
 		}
 	}
@@ -151,7 +159,9 @@ func (this *FeignRequest) FeignDelete() (feign []byte, err error) {
 		}
 	} else {
 		for i := 0; i < nacos.InitConfiguration.Feign.RetryNum; i++ {
-			if feign, err = deleteFeign(this.ServerName, this.GroupName, this.Url, this.Body, this.C); err == nil {
+			if feign, err = deleteFeign(this.ServerName, this.GroupName, this.Url, this.Body, this.C); err != nil {
+				this.C.SysError("服务内部调用delete请求", err, logs.Desc(fmt.Sprintf("内部调用第%d次失败", i+1)))
+			} else {
 				return
 			}
 		}
@@ -169,6 +179,7 @@ func deleteFeign(serviceName, groupName, url string, params interface{}, c *goCo
 			c.SysError("服务内部调用delete请求", err)
 			return nil, err
 		} else {
+			c.SysDebug("服务内部调用delete请求", logs.Desc("内部调用返回成功"))
 			return rtn, nil
 		}
 	}

@@ -35,6 +35,7 @@ func Get(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, err
 		logs.Lg.SysError("Get请求", requestErr, c, logs.Desc(strings.NewReader(url)))
 		return nil, requestErr
 	}
+	logs.Lg.SysDebug("Get请求", c, logs.Desc(fmt.Sprintf("请求地址：%s", request.RequestURI)))
 	request.Header.Add(constants.CONTENT_TYPE_KEY, constants.CONTENT_TYPE_INNER)
 	if len(c) != 0 {
 		if user, has := c[0].Params.Get(constants.REQUEST_USER_KEY); has {
@@ -57,6 +58,7 @@ func Get(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, err
 			logs.Lg.SysError("Get请求", err, c, logs.Desc(resp.Body))
 			return nil, err
 		} else {
+			logs.Lg.SysDebug("Get请求", c, logs.Desc(fmt.Sprintf("请求成功，返回：%s", string(body))))
 			return body, nil
 		}
 	}
@@ -88,6 +90,7 @@ func Post(ipPort, url, params interface{}, c ...*gin.Context) ([]byte, error) {
 		logs.Lg.SysError("Post请求", requestErr, c, logs.Desc(strings.NewReader(requestUrl)))
 		return nil, requestErr
 	}
+	logs.Lg.SysDebug("Post请求", c, logs.Desc(fmt.Sprintf("请求地址：%s", request.RequestURI)))
 	request.Header.Add(constants.CONTENT_TYPE_KEY, constants.CONTENT_TYPE_INNER)
 	if len(c) != 0 {
 		if user, has := c[0].Params.Get(constants.REQUEST_USER_KEY); has {
@@ -110,6 +113,7 @@ func Post(ipPort, url, params interface{}, c ...*gin.Context) ([]byte, error) {
 			logs.Lg.SysError("Post请求", err, c, logs.Desc(resp.Body))
 			return nil, err
 		} else {
+			logs.Lg.SysDebug("Post请求", c, logs.Desc(fmt.Sprintf("请求成功，返回：%s", string(body))))
 			return body, nil
 		}
 	}
@@ -127,6 +131,7 @@ func Put(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, err
 		logs.Lg.SysError("Put请求", requestErr, c, logs.Desc(strings.NewReader(url)))
 		return nil, requestErr
 	}
+	logs.Lg.SysDebug("Put请求", c, logs.Desc(fmt.Sprintf("请求地址：%s", request.RequestURI)))
 	request.Header.Add(constants.CONTENT_TYPE_KEY, constants.CONTENT_TYPE_INNER)
 	if len(c) != 0 {
 		if user, has := c[0].Params.Get(constants.REQUEST_USER_KEY); has {
@@ -149,6 +154,7 @@ func Put(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, err
 		logs.Lg.SysError("Put请求", err, c, logs.Desc(strings.NewReader(url)))
 		return nil, err
 	} else {
+		logs.Lg.SysDebug("Put请求", c, logs.Desc(fmt.Sprintf("请求成功，返回：%s", string(body))))
 		return body, nil
 	}
 }
@@ -165,6 +171,7 @@ func Delete(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, 
 		logs.Lg.SysError("Delete请求", requestErr, c, logs.Desc(strings.NewReader(url)))
 		return nil, requestErr
 	}
+	logs.Lg.SysDebug("Delete请求", c, logs.Desc(fmt.Sprintf("请求地址：%s", request.RequestURI)))
 	request.Header.Add(constants.CONTENT_TYPE_KEY, constants.CONTENT_TYPE_INNER)
 	if len(c) != 0 {
 		if user, has := c[0].Params.Get(constants.REQUEST_USER_KEY); has {
@@ -187,6 +194,7 @@ func Delete(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, 
 		logs.Lg.SysError("Delete请求", err, c, logs.Desc(strings.NewReader(url)))
 		return nil, err
 	} else {
+		logs.Lg.SysDebug("Delete请求", c, logs.Desc(fmt.Sprintf("请求成功，返回：%s", string(body))))
 		return body, err
 	}
 }

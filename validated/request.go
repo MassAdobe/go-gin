@@ -18,9 +18,10 @@ import (
 **/
 func BindAndCheck(c *goContext.Context, data interface{}) {
 	if err := c.GinContext.Bind(&data); err != nil { // 获取参数
-		logs.Lg.SysError("解析入参错误", err, c)
+		logs.Lg.SysError("解析入参", err, c, logs.Desc("解析入参错误"))
 		panic(errs.NewError(errs.ErrParamCode))
 	}
+	logs.Lg.SysDebug("解析入参", c, logs.Desc("解析入参成功"))
 	_ = GlobalValidator.Check(data)
 }
 

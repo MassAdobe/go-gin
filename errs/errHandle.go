@@ -128,12 +128,14 @@ func ErrHandler() gin.HandlerFunc {
 				} else {
 					Err = ServerError
 				}
-				logs.Lg.GlobalError("响应日志", c, logs.Desc("错误"), logs.BasicError(err))
+				logs.Lg.GlobalError("整体错误处理", c, logs.Desc("错误"), logs.BasicError(err))
 				c.JSON(Err.StatusCode, Err)
 				if c.IsAborted() {
+					logs.Lg.SysDebug("整体错误处理", c, logs.Desc("当前请求已经截止"))
 					return
 				}
 				if finish, exists := c.Get("finish"); c.IsAborted() && exists {
+					logs.Lg.SysDebug("整体错误处理", c, logs.Desc("当前请求顺利完成，发送完成信号"))
 					finish.(chan bool) <- true
 				}
 			}
