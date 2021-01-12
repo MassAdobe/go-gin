@@ -56,7 +56,7 @@ func NewRouter() (rtr *gin.Engine) {
 	logs.Lg.SysDebug("路由", logs.Desc("增加全局错误处理"))
 	rtr.Use(filter.RateLimit()) // 全局处理限流
 	logs.Lg.SysDebug("路由", logs.Desc("增加全局处理限流"))
-	other := rtr.Group("other").Use(filter.SetTraceAndStep()).Use(filter.GetReqUser())
+	other := rtr.Group(nacos.RequestPath("other")).Use(filter.SetTraceAndStep()).Use(filter.GetReqUser())
 	{
 		// 保证幂等 必须存在redis接入
 		if len(nacos.InitConfiguration.Redis.IpPort) != 0 {
