@@ -12,6 +12,7 @@ import (
 	"go.uber.org/ratelimit"
 	"gopkg.in/yaml.v2"
 	"os"
+	"strings"
 )
 
 const (
@@ -81,11 +82,11 @@ func ReadRateProfile(profile *InitNacosConfiguration) {
 	} else if len(profile.Rate.InterfaceAndRate) != 0 { // 如果不是全局，那么逐个设置
 		// 先删除取消的
 		for k := range PastRateMap {
-			if _, okay := profile.Rate.InterfaceAndRate[addProgramName(k)]; okay { // 存在
+			if _, okay := profile.Rate.InterfaceAndRate[deleteProgramName(k)]; okay { // 存在
 				continue
 			} else { // 不存在
-				delete(RateMap, addProgramName(k))
-				delete(PastRateMap, addProgramName(k))
+				delete(RateMap, k)
+				delete(PastRateMap, k)
 			}
 		}
 		// 再增加新增和修改的
@@ -109,5 +110,16 @@ func ReadRateProfile(profile *InitNacosConfiguration) {
  * @Description: 在url中增加头路径
 **/
 func addProgramName(k string) string {
-	return fmt.Sprintf("/%s%s", InitConfiguration.Serve.ServerName, k)
+	k = fmt.Sprintf("/%s%s", InitConfiguration.Serve.ServerName, k)
+	return k
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2021/1/13 10:15 上午
+ * @Description: 在url中去除头路径
+**/
+func deleteProgramName(k string) string {
+	k = k[strings.Index(k[1:], "/")+1:]
+	return k
 }

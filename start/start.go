@@ -73,3 +73,14 @@ func GracefulShutdown(server *http.Server) {
 	db.CloseDb()            // 关停数据库连接池，释放句柄
 	logs.Lg.SysInfo("退出成功", logs.Desc(fmt.Sprintf("退出花费时间: %v", time.Since(now))))
 }
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2021/1/12 5:11 下午
+ * @Description: 关闭相关服务
+**/
+func ShutdownServices() {
+	nacos.NacosDeregister() // nacos注销服务
+	rds.CloseRds()          // 关闭Redis并释放句柄
+	db.CloseDb()            // 关停数据库连接池，释放句柄
+}
