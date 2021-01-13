@@ -48,8 +48,8 @@ func NacosDiscovery() {
 				Enable:      true,
 				Healthy:     true,
 				Ephemeral:   true,
-				Metadata:    map[string]string{"idc": "shanghai", "timestamp": systemUtils.RtnCurTime()},
-				ClusterName: "DEFAULT",                // 默认值DEFAULT
+				Metadata:    map[string]string{"idc": "shanghai", "timestamp": systemUtils.RtnCurTime(), "version": pojo.InitConf.Version},
+				ClusterName: pojo.InitConf.Version,    // 默认值DEFAULT
 				GroupName:   pojo.InitConf.NacosGroup, // 默认值DEFAULT_GROUP
 			})
 			if !success || nil != namingErr {
@@ -73,7 +73,7 @@ func NacosDeregister() {
 			Port:        InitConfiguration.Serve.Port,
 			ServiceName: InitConfiguration.Serve.ServerName,
 			Ephemeral:   true,
-			Cluster:     "DEFAULT",                // 默认值DEFAULT
+			Cluster:     pojo.InitConf.Version,    // 默认值DEFAULT
 			GroupName:   pojo.InitConf.NacosGroup, // 默认值DEFAULT_GROUP
 		})
 		if !success || nil != err {
@@ -92,8 +92,8 @@ func NacosDeregister() {
 func NacosGetServer(serviceName, groupName string) (instance *model.Instance, err error) {
 	instance, err = namingClient.SelectOneHealthyInstance(vo.SelectOneHealthInstanceParam{
 		ServiceName: serviceName,
-		GroupName:   groupName,           // 默认值DEFAULT_GROUP
-		Clusters:    []string{"DEFAULT"}, // 默认值DEFAULT
+		GroupName:   groupName,                       // 默认值DEFAULT_GROUP
+		Clusters:    []string{pojo.InitConf.Version}, // 默认值DEFAULT
 	})
 	if err != nil {
 		logs.Lg.SysError("nacos服务注册与发现", err, logs.Desc("获取服务失败"))

@@ -33,6 +33,7 @@ type InitConfig struct {
 	ProgramEnv             string `yaml:"ProgramEnv"`             // 项目启动环境：DEBUG-开发，TEST-测试，RELEASE-生产
 	LogPath                string `yaml:"LogPath"`                // 日志输出路径(本地配置优先级最高)
 	LogLevel               string `yaml:"LogLevel"`               // 日志级别(本地配置优先级最高)
+	Version                string `yaml:"Version"`                // 版本
 }
 
 /**

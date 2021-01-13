@@ -58,6 +58,8 @@ ProgramEnv: 'DEBUG'
 LogPath: ''
 # 日志级别(本地配置优先级最高)
 LogLevel: ''
+# 版本 不能有"."
+Version: 'v1-0-0'
 ```
 
 ---
