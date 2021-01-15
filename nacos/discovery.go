@@ -6,6 +6,7 @@
 package nacos
 
 import (
+	"errors"
 	"fmt"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/pojo"
@@ -97,13 +98,19 @@ func NacosGetServer(serviceName, groupName string) (instance *model.Instance, er
 	})
 	if err != nil {
 		logs.Lg.SysError("nacos服务注册与发现", err, logs.Desc(fmt.Sprintf("获取服务失败，查询版本为: %s的服务", pojo.InitConf.CurVersion)))
-		instance, err = namingClient.SelectOneHealthyInstance(vo.SelectOneHealthInstanceParam{
-			ServiceName: serviceName,
-			GroupName:   groupName,                           // 默认值DEFAULT_GROUP
-			Clusters:    []string{pojo.InitConf.LastVersion}, // 默认值DEFAULT
-		})
-		if err != nil {
-			logs.Lg.SysError("nacos服务注册与发现", err, logs.Desc(fmt.Sprintf("获取服务再次失败，查询版本为: %s的服务", pojo.InitConf.LastVersion)))
+		if len(pojo.InitConf.LastVersion) != 0 {
+			instance, err = namingClient.SelectOneHealthyInstance(vo.SelectOneHealthInstanceParam{
+				ServiceName: serviceName,
+				GroupName:   groupName,                           // 默认值DEFAULT_GROUP
+				Clusters:    []string{pojo.InitConf.LastVersion}, // 默认值DEFAULT
+			})
+			if err != nil {
+				logs.Lg.SysError("nacos服务注册与发现", err, logs.Desc(fmt.Sprintf("获取服务再次失败，查询版本为: %s的服务", pojo.InitConf.LastVersion)))
+				instance = nil
+				return
+			}
+		} else {
+			logs.Lg.SysError("nacos服务注册与发现", errors.New("system has not configure last version"), logs.Desc(fmt.Sprintf("当前系统没有配置上一次版本，查询版本为: %s的服务", pojo.InitConf.LastVersion)))
 			instance = nil
 			return
 		}

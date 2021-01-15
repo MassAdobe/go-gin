@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/MassAdobe/go-gin/db"
+	ginHttp "github.com/MassAdobe/go-gin/http"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/nacos"
 	"github.com/MassAdobe/go-gin/pojo"
@@ -68,9 +69,10 @@ func GracefulShutdown(server *http.Server) {
 	if err := server.Shutdown(cxt); err != nil {
 		logs.Lg.SysError("关闭失败", err)
 	}
-	nacos.NacosDeregister() // nacos注销服务
-	rds.CloseRds()          // 关闭Redis并释放句柄
-	db.CloseDb()            // 关停数据库连接池，释放句柄
+	nacos.NacosDeregister()           // nacos注销服务
+	rds.CloseRds()                    // 关闭Redis并释放句柄
+	db.CloseDb()                      // 关停数据库连接池，释放句柄
+	ginHttp.CloseHttpConnectionPool() // 关闭HTTP连接池
 	logs.Lg.SysInfo("退出成功", logs.Desc(fmt.Sprintf("退出花费时间: %v", time.Since(now))))
 }
 
@@ -80,7 +82,8 @@ func GracefulShutdown(server *http.Server) {
  * @Description: 关闭相关服务
 **/
 func ShutdownServices() {
-	nacos.NacosDeregister() // nacos注销服务
-	rds.CloseRds()          // 关闭Redis并释放句柄
-	db.CloseDb()            // 关停数据库连接池，释放句柄
+	nacos.NacosDeregister()           // nacos注销服务
+	rds.CloseRds()                    // 关闭Redis并释放句柄
+	db.CloseDb()                      // 关停数据库连接池，释放句柄
+	ginHttp.CloseHttpConnectionPool() // 关闭HTTP连接池
 }

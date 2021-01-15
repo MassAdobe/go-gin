@@ -13,10 +13,48 @@ import (
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"reflect"
 	"strings"
+	"time"
 )
+
+var (
+	client *http.Client
+	req    string
+)
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2021/1/15 10:46 上午
+ * @Description: 初始化连接池
+**/
+func init() {
+	client = &http.Client{
+		Timeout: constants.REQUEST_TIMEOUT_TM,
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second, // 连接超时
+				KeepAlive: 30 * time.Second, // 长连接超时时间
+			}).DialContext,
+			MaxIdleConns:          50,               // 最大空闲连接
+			IdleConnTimeout:       90 * time.Second, // 空闲超时时间
+			TLSHandshakeTimeout:   10 * time.Second, // tls握手超时时间
+			ExpectContinueTimeout: 1 * time.Second,  // 100-continue 超时时间
+		},
+	}
+}
+
+/**
+ * @Author: MassAdobe
+ * @TIME: 2021/1/15 10:50 上午
+ * @Description: 关闭HTTP连接池
+**/
+func CloseHttpConnectionPool() {
+	client.CloseIdleConnections()
+	logs.Lg.SysDebug("http连接池", logs.Desc("关闭http最大空闲连接"))
+}
 
 /**
  * @Author: MassAdobe
@@ -24,12 +62,8 @@ import (
  * @Description: Get请求
 **/
 func Get(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, error) {
-	var (
-		resp *http.Response
-		err  error
-	)
+	logs.Lg.SysDebug("Get请求", logs.Desc("进入Get请求方法"))
 	url = url + urlEncode(params)
-	client := http.Client{Timeout: constants.REQUEST_TIMEOUT_TM}
 	request, requestErr := http.NewRequest(http.MethodGet, fmt.Sprintf("http://%s%s", ipPort, url), nil)
 	if nil != requestErr {
 		logs.Lg.SysError("Get请求", requestErr, c, logs.Desc(strings.NewReader(url)))
@@ -48,12 +82,21 @@ func Get(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, err
 			request.Header.Add(constants.REQUEST_STEP_ID, step)
 		}
 	}
+	var (
+		resp *http.Response
+		err  error
+	)
+	defer func() {
+		if respErr := resp.Body.Close(); respErr != nil {
+			logs.Lg.SysError("Get请求", respErr, logs.Desc("关闭返回体失败"))
+			return
+		}
+		logs.Lg.SysDebug("Get请求", logs.Desc("关闭返回体成功"))
+	}()
 	if resp, err = client.Do(request); err != nil {
-		defer resp.Body.Close()
 		logs.Lg.SysError("Get请求", err, c, logs.Desc(strings.NewReader(url)))
 		return nil, err
 	} else {
-		defer resp.Body.Close()
 		if body, err := ioutil.ReadAll(resp.Body); err != nil {
 			logs.Lg.SysError("Get请求", err, c, logs.Desc(resp.Body))
 			return nil, err
@@ -70,11 +113,7 @@ func Get(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, err
  * @Description: Post请求
 **/
 func Post(ipPort, url, params interface{}, c ...*gin.Context) ([]byte, error) {
-	var (
-		resp *http.Response
-		err  error
-		req  string
-	)
+	logs.Lg.SysDebug("Post请求", logs.Desc("进入Post请求方法"))
 	if nil != params { // 判断参数是否为空
 		if bytes, err := json.Marshal(params); err != nil {
 			logs.Lg.SysError("Post请求", err)
@@ -83,7 +122,6 @@ func Post(ipPort, url, params interface{}, c ...*gin.Context) ([]byte, error) {
 			req = string(bytes)
 		}
 	}
-	client := http.Client{Timeout: constants.REQUEST_TIMEOUT_TM}
 	requestUrl := fmt.Sprintf("http://%s%s", ipPort, url)
 	request, requestErr := http.NewRequest(http.MethodPost, requestUrl, strings.NewReader(req))
 	if nil != requestErr {
@@ -103,12 +141,21 @@ func Post(ipPort, url, params interface{}, c ...*gin.Context) ([]byte, error) {
 			request.Header.Add(constants.REQUEST_STEP_ID, step)
 		}
 	}
+	var (
+		resp *http.Response
+		err  error
+	)
+	defer func() {
+		if respErr := resp.Body.Close(); respErr != nil {
+			logs.Lg.SysError("Post请求", respErr, logs.Desc("关闭返回体失败"))
+			return
+		}
+		logs.Lg.SysDebug("Post请求", logs.Desc("关闭返回体成功"))
+	}()
 	if resp, err = client.Do(request); err != nil {
-		defer resp.Body.Close()
 		logs.Lg.SysError("Post请求", err, c, logs.Desc(req))
 		return nil, err
 	} else {
-		defer resp.Body.Close()
 		if body, err := ioutil.ReadAll(resp.Body); err != nil {
 			logs.Lg.SysError("Post请求", err, c, logs.Desc(resp.Body))
 			return nil, err
@@ -125,6 +172,7 @@ func Post(ipPort, url, params interface{}, c ...*gin.Context) ([]byte, error) {
  * @Description: Put请求
 **/
 func Put(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, error) {
+	logs.Lg.SysDebug("Put请求", logs.Desc("进入Put请求方法"))
 	url = url + urlEncode(params)
 	request, requestErr := http.NewRequest(http.MethodPut, fmt.Sprintf("http://%s%s", ipPort, url), nil)
 	if nil != requestErr {
@@ -144,9 +192,14 @@ func Put(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, err
 			request.Header.Add(constants.REQUEST_STEP_ID, step)
 		}
 	}
-	client := http.Client{Timeout: constants.REQUEST_TIMEOUT_TM}
 	resp, err := client.Do(request)
-	defer resp.Body.Close()
+	defer func() {
+		if respErr := resp.Body.Close(); respErr != nil {
+			logs.Lg.SysError("Put请求", respErr, logs.Desc("关闭返回体失败"))
+			return
+		}
+		logs.Lg.SysDebug("Put请求", logs.Desc("关闭返回体成功"))
+	}()
 	if err != nil {
 		logs.Lg.SysError("Put请求", err, c, logs.Desc(strings.NewReader(url)))
 	}
@@ -165,6 +218,7 @@ func Put(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, err
  * @Description: Delete请求
 **/
 func Delete(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, error) {
+	logs.Lg.SysDebug("Delete请求", logs.Desc("进入Post请求方法"))
 	url = url + urlEncode(params)
 	request, requestErr := http.NewRequest(http.MethodDelete, fmt.Sprintf("http://%s%s", ipPort, url), nil)
 	if nil != requestErr {
@@ -184,9 +238,14 @@ func Delete(ipPort, url string, params interface{}, c ...*gin.Context) ([]byte, 
 			request.Header.Add(constants.REQUEST_STEP_ID, step)
 		}
 	}
-	client := http.Client{Timeout: constants.REQUEST_TIMEOUT_TM}
 	resp, err := client.Do(request)
-	defer resp.Body.Close()
+	defer func() {
+		if respErr := resp.Body.Close(); respErr != nil {
+			logs.Lg.SysError("Delete请求", respErr, logs.Desc("关闭返回体失败"))
+			return
+		}
+		logs.Lg.SysDebug("Delete请求", logs.Desc("关闭返回体成功"))
+	}()
 	if err != nil {
 		logs.Lg.SysError("Delete请求", err, c, logs.Desc(strings.NewReader(url)))
 	}
