@@ -51,6 +51,10 @@ type HandlerFunc func(c *Context)
 **/
 func Handle(handle HandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if len(c.Request.Header.Get(constants.TOKEN_KEY)) != 0 {
+			c.Header(constants.TOKEN_KEY, c.Request.Header.Get(constants.TOKEN_KEY))
+			logs.Lg.SysDebug("中间件-超时", logs.Desc(fmt.Sprintf("获取到刷新的TOKEN: %s, 放入到返回体中", c.Request.Header.Get(constants.TOKEN_KEY))))
+		}
 		if strings.ToLower(pojo.InitConf.ProgramEnv) == GO_CONTEXT_ENV_DEBUG {
 			logs.Lg.SysDebug("中间件-超时", c, "当前环境为开发环境，默认取消超时设置")
 			handle(&Context{c, &logs.Lg})

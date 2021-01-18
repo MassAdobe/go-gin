@@ -12,7 +12,6 @@ package pojo
 **/
 var (
 	InitConf InitConfig // 初始化配置
-	SysConf  SysConfig  // 系统配置
 	CurIp    string     // 当前宿主IP
 )
 
@@ -35,14 +34,4 @@ type InitConfig struct {
 	LogLevel               string `yaml:"LogLevel"`               // 日志级别(本地配置优先级最高)
 	LastVersion            string `yaml:"LastVersion"`            // 版本(上一个)
 	CurVersion             string `yaml:"CurVersion"`             // 版本(当前)
-}
-
-/**
- * @Author: MassAdobe
- * @TIME: 2020-04-26 19:59
- * @Description: 系统配置
-**/
-type SysConfig struct {
-	TokenVerify string `yaml:"TokenVerify"` // Token中校验元素secret
-	JwtKey      string `yaml:"JwtKey"`      // JWT认证加密私钥
 }

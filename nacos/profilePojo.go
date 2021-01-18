@@ -44,9 +44,11 @@ type InitNacosConfiguration struct {
 			Dbname   string `yaml:"dbname"`   // 数据库名称
 		} `yaml:"write"`
 	} `yaml:"gorm"`
+
 	Feign struct { // 内部调用配置
 		RetryNum int `yaml:"retry-num"` // 内部调用重试次数
 	} `yaml:"feign"`
+
 	Redis struct { // redis配置
 		MaxIdle        int    `yaml:"max-idle"`        // 最大挂起数
 		MaxActive      int    `yaml:"max-active"`      // 最大活跃数
@@ -58,11 +60,16 @@ type InitNacosConfiguration struct {
 		ReadTimeout    int    `yaml:"read-timeout"`    // 读超时时间（秒）
 		WriteTimeout   int    `yaml:"write-timeout"`   // 写超时时间（秒）
 	} `yaml:"redis"`
+
 	Rate struct { // 限流（漏斗）
 		All              bool           `yaml:"all"`                // 是否是全局
 		Rate             int            `yaml:"rate"`               // 限流数量
 		InterfaceAndRate map[string]int `yaml:"interface-and-rate"` // 限流接口以及限流数
 	} `yaml:"rate"`
+
+	AccessToken struct {
+		Verify string `yaml:"verify"` // 校验字段
+	} `yaml:"access-token"` // 用户携带token
 }
 
 /**

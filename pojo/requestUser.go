@@ -7,9 +7,10 @@ package pojo
 
 /**
  * @Author: MassAdobe
- * @TIME: 2020-04-27 21:58
+ * @TIME: 2021/1/15 2:02 下午
  * @Description: 用户基本信息
 **/
 type RequestUser struct {
-	UserId int `json:"user_id"` // 用户ID
+	UserId   int64  `json:"user_id"`   // 用户ID
+	UserFrom string `json:"user_from"` // 用户来源
 }

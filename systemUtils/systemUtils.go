@@ -116,9 +116,9 @@ func RandSeq(n int) string {
  * @TIME: 2021/1/7 11:35 上午
  * @Description: 生成幂等token(保证64位长度)
 **/
-func RandIdempotentToken(userId int) string {
-	itoa := strconv.Itoa(userId)
-	return itoa + RandSeq(64-len(itoa))
+func RandIdempotentToken(userId int64) string {
+	formatInt := strconv.FormatInt(userId, 10)
+	return formatInt + RandSeq(64-len(formatInt))
 }
 
 /**
