@@ -8,6 +8,7 @@ package nacos
 import (
 	"errors"
 	"fmt"
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/pojo"
 	"github.com/MassAdobe/go-gin/systemUtils"
@@ -28,8 +29,8 @@ func NacosDiscovery() {
 		var namingClientErr error
 		// 创建服务发现客户端
 		namingClient, namingClientErr = clients.CreateNamingClient(map[string]interface{}{
-			"serverConfigs": serverCs,
-			"clientConfig":  clientC,
+			constants.NACOS_SERVER_CONFIGS_MARK: serverCs,
+			constants.NACOS_CLIENT_CONFIG_MARK:  clientC,
 		})
 		if nil != namingClientErr {
 			logs.Lg.SysError("nacos服务注册与发现", namingClientErr, logs.Desc("创建服务发现客户端失败"))
@@ -49,7 +50,7 @@ func NacosDiscovery() {
 				Enable:      true,
 				Healthy:     true,
 				Ephemeral:   true,
-				Metadata:    map[string]string{"idc": "shanghai", "timestamp": systemUtils.RtnCurTime(), "version": pojo.InitConf.CurVersion},
+				Metadata:    map[string]string{constants.NACOS_REGIST_IDC_MARK: constants.NACOS_REGIST_IDC_INNER, constants.NACOS_REGIST_TIMESTAMP_MARK: systemUtils.RtnCurTime(), constants.NACOS_REGIST_VERSION_MARK: pojo.InitConf.CurVersion},
 				ClusterName: pojo.InitConf.CurVersion, // 默认值DEFAULT
 				GroupName:   pojo.InitConf.NacosGroup, // 默认值DEFAULT_GROUP
 			})

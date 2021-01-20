@@ -7,16 +7,13 @@ package nacos
 
 import (
 	"fmt"
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/systemUtils"
 	"go.uber.org/ratelimit"
 	"gopkg.in/yaml.v2"
 	"os"
 	"strings"
-)
-
-const (
-	RATE_ALL = "all" // 限流漏斗全局
 )
 
 /**
@@ -62,7 +59,7 @@ func ReadNacosSelfProfile(content string, pojo interface{}) {
 **/
 func InitRateProfile() {
 	if InitConfiguration.Rate.All { // 如果是全局，只设置一个值
-		RateMap["all"], PastRateMap["all"] = ratelimit.New(InitConfiguration.Rate.Rate), InitConfiguration.Rate.Rate
+		RateMap[constants.RATE_ALL], PastRateMap[constants.RATE_ALL] = ratelimit.New(InitConfiguration.Rate.Rate), InitConfiguration.Rate.Rate
 	} else if len(InitConfiguration.Rate.InterfaceAndRate) != 0 { // 如果不是全局，那么逐个设置
 		for k, v := range InitConfiguration.Rate.InterfaceAndRate {
 			RateMap[addProgramName(k)], PastRateMap[addProgramName(k)] = ratelimit.New(v), v
@@ -78,7 +75,7 @@ func InitRateProfile() {
 func ReadRateProfile(profile *InitNacosConfiguration) {
 	if InitConfiguration.Rate.All { // 如果是全局，只设置一个值
 		RateMap, PastRateMap = make(map[string]ratelimit.Limiter), make(map[string]int)
-		RateMap[RATE_ALL], PastRateMap[RATE_ALL] = ratelimit.New(InitConfiguration.Rate.Rate), InitConfiguration.Rate.Rate
+		RateMap[constants.RATE_ALL], PastRateMap[constants.RATE_ALL] = ratelimit.New(InitConfiguration.Rate.Rate), InitConfiguration.Rate.Rate
 	} else if len(profile.Rate.InterfaceAndRate) != 0 { // 如果不是全局，那么逐个设置
 		// 先删除取消的
 		for k := range PastRateMap {
@@ -120,6 +117,6 @@ func addProgramName(k string) string {
  * @Description: 在url中去除头路径
 **/
 func deleteProgramName(k string) string {
-	k = k[strings.Index(k[1:], "/")+1:]
+	k = k[strings.Index(k[1:], constants.BACKSLASH_MARK)+1:]
 	return k
 }

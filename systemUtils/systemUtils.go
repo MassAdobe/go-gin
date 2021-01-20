@@ -29,8 +29,14 @@ import (
  * @Description: 常量池
 **/
 const (
-	TimeFormatMS    = "2006-01-02 15:04:05"
-	TimeFormatMonth = "2006-01-02"
+	TIME_FORMAT_MS    = "2006-01-02 15:04:05"
+	TIME_FORMAT_MONTH = "2006-01-02"
+	QUESTION_MARK     = "?"
+)
+
+var (
+	randCodeSeqCodes = []rune("0123456789")
+	randSeqLetters   = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890") // 随机字符串基础值
 )
 
 /**
@@ -94,19 +100,12 @@ func RandInt(min, max int) int {
 /**
  * @Author: MassAdobe
  * @TIME: 2020-04-26 21:13
- * @Description: 随机字符串基础值
-**/
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
-
-/**
- * @Author: MassAdobe
- * @TIME: 2020-04-26 21:13
  * @Description: 随机字符串
 **/
 func RandSeq(n int) string {
 	b, r := make([]rune, n), rand.New(rand.NewSource(time.Now().UnixNano()))
 	for i := range b {
-		b[i] = letters[r.Intn(len(letters))]
+		b[i] = randSeqLetters[r.Intn(len(randSeqLetters))]
 	}
 	return string(b)
 }
@@ -127,10 +126,9 @@ func RandIdempotentToken(userId int64) string {
  * @Description: 生成手机验证码
 **/
 func RandCodeSeq() string {
-	var codes = []rune("0123456789")
 	b, r := make([]rune, 6), rand.New(rand.NewSource(time.Now().UnixNano()))
 	for i := range b {
-		b[i] = codes[r.Intn(len(codes))]
+		b[i] = randCodeSeqCodes[r.Intn(len(randCodeSeqCodes))]
 	}
 	return string(b)
 }
@@ -200,7 +198,7 @@ func ExternalIP() (net.IP, error) {
 			return ip, nil
 		}
 	}
-	return nil, errors.New("没链接网络")
+	return nil, errors.New("did not connect to network")
 }
 
 func getIpFromAddr(addr net.Addr) net.IP {
@@ -227,8 +225,8 @@ func getIpFromAddr(addr net.Addr) net.IP {
  * @Description: 获取请求url上的所有参数
 **/
 func GetRequestUrlParams(uri string) string {
-	if strings.Contains(uri, "?") {
-		return uri[strings.Index(uri, "?")+1:]
+	if strings.Contains(uri, QUESTION_MARK) {
+		return uri[strings.Index(uri, QUESTION_MARK)+1:]
 	}
 	return ""
 }
@@ -239,7 +237,7 @@ func GetRequestUrlParams(uri string) string {
  * @Description: 返回时间字符串
 **/
 func RtnTmString() (timsStr string) {
-	timsStr = time.Now().Format(TimeFormatMS)
+	timsStr = time.Now().Format(TIME_FORMAT_MS)
 	return
 }
 
@@ -249,7 +247,7 @@ func RtnTmString() (timsStr string) {
  * @Description: 返回当前时间戳
 **/
 func RtnCurTime() string {
-	return time.Now().Format(TimeFormatMS)
+	return time.Now().Format(TIME_FORMAT_MS)
 }
 
 /**

@@ -34,12 +34,12 @@ func CreateToken(userId int64, userFrom string) string {
 	if tokenss, err := token.SignedString([]byte(nacos.InitConfiguration.AccessToken.Verify)); err != nil {
 		logs.Lg.Error("生成Access-Token错误", err)
 	} else {
-		split := strings.Split(tokenss, ".")
+		split := strings.Split(tokenss, constants.FULL_STOP_MARK)
 		tokenss = ""
 		for idx, str := range split {
 			if 0 != idx {
 				split[idx] = str[10:] + str[:10]
-				tokenss += "." + split[idx]
+				tokenss += constants.FULL_STOP_MARK + split[idx]
 			} else {
 				tokenss += split[idx]
 			}

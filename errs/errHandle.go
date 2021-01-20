@@ -6,6 +6,7 @@
 package errs
 
 import (
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -134,7 +135,7 @@ func ErrHandler() gin.HandlerFunc {
 					logs.Lg.SysDebug("整体错误处理", c, logs.Desc("当前请求已经截止"))
 					return
 				}
-				if finish, exists := c.Get("finish"); c.IsAborted() && exists {
+				if finish, exists := c.Get(constants.REQUEST_FINISH); c.IsAborted() && exists {
 					logs.Lg.SysDebug("整体错误处理", c, logs.Desc("当前请求顺利完成，发送完成信号"))
 					finish.(chan bool) <- true
 				}

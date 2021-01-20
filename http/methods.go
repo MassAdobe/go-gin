@@ -273,6 +273,6 @@ func urlEncode(params interface{}) string {
 	for k := 0; k < t.NumField(); k++ {
 		urls = append(urls, fmt.Sprintf("%s=%v", t.Field(k).Tag.Get("json"), v.Field(k).Interface()))
 	}
-	urlStr := strings.Join(urls, "&")
-	return "?" + strings.ReplaceAll(urlStr, " ", ",")
+	urlStr := strings.Join(urls, constants.AND_MARK)
+	return constants.QUESTION_MARK + strings.ReplaceAll(urlStr, constants.SPACE_MARK, constants.COMMA_MARK)
 }

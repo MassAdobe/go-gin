@@ -7,6 +7,7 @@ package validated
 
 import (
 	"bytes"
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/errs"
 	"github.com/MassAdobe/go-gin/logs"
 	valid "github.com/go-playground/locales/zh"
@@ -41,13 +42,13 @@ var GlobalValidator Validator
 func InitValidator() {
 	zhs := valid.New()
 	uni := ut.New(zhs, zhs)
-	trans, ok := uni.GetTranslator("zh")
+	trans, ok := uni.GetTranslator(constants.CHINESE_TYPE)
 	if !ok {
 		panic(errs.NewMsgError(errs.ErrSystemCode, "初始化验证器错误"))
 	}
 	validate := validator.New()
 	validate.RegisterTagNameFunc(func(fld reflect.StructField) string { // 收集结构体中的comment标签，用于替换英文字段名称，这样返回错误就能展示中文字段名称了
-		return fld.Tag.Get("comment")
+		return fld.Tag.Get(constants.VALIDATE_COMMENT_MARK)
 	})
 	err := zh.RegisterDefaultTranslations(validate, trans) // 注册中文翻译
 	if err != nil {

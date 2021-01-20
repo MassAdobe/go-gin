@@ -7,6 +7,7 @@ package db
 
 import (
 	"fmt"
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/nacos"
 	"github.com/jinzhu/gorm"
@@ -26,11 +27,6 @@ var (
 	Write *gorm.DB // 写库
 )
 
-const (
-	DB_SQL = "sql"
-	DB_LOG = "log"
-)
-
 /**
  * @Author: MassAdobe
  * @TIME: 2020/12/17 1:49 下午
@@ -38,7 +34,7 @@ const (
 **/
 func InitDB() {
 	if len(nacos.InitConfiguration.Gorm.Read.Ip) != 0 { // 初始化读库
-		if gg, err := gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+		if gg, err := gorm.Open(constants.DB_TYPE, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
 			nacos.InitConfiguration.Gorm.Read.Username,
 			nacos.InitConfiguration.Gorm.Read.PassWord,
 			nacos.InitConfiguration.Gorm.Read.Ip,
@@ -62,7 +58,7 @@ func InitDB() {
 		}
 	}
 	if len(nacos.InitConfiguration.Gorm.Write.Ip) != 0 { // 初始化写库
-		if gg, err := gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+		if gg, err := gorm.Open(constants.DB_TYPE, fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
 			nacos.InitConfiguration.Gorm.Write.Username,
 			nacos.InitConfiguration.Gorm.Write.PassWord,
 			nacos.InitConfiguration.Gorm.Write.Ip,
@@ -128,7 +124,7 @@ type DbLog struct{}
 **/
 func (logger *DbLog) Print(values ...interface{}) {
 	switch values[0] {
-	case DB_SQL:
+	case constants.DB_SQL:
 		logs.Lg.SysDebug(
 			"数据库日志",
 			zap.Any("资源", values[1]),
@@ -137,7 +133,7 @@ func (logger *DbLog) Print(values ...interface{}) {
 			zap.String("执行参数", fmt.Sprintf("%v", values[4])),
 			zap.String("影响行数", fmt.Sprintf("%v", values[5])),
 		)
-	case DB_LOG:
+	case constants.DB_LOG:
 		logs.Lg.SysDebug("数据库日志", zap.Any("其他", values[2]))
 	}
 }

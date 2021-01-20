@@ -7,6 +7,7 @@ package rds
 
 import (
 	"errors"
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/nacos"
 	"github.com/gomodule/redigo/redis"
@@ -14,38 +15,8 @@ import (
 	"time"
 )
 
-const (
-	REDIS_DIAL_TCP = "tcp"
-)
-
 var (
 	Redis *redis.Pool
-)
-
-/**
- * @Author: MassAdobe
- * @TIME: 2020/12/28 1:41 下午
- * @Description: redis的命令常量
-**/
-const (
-	RDS_PING     = "PING"
-	RDS_HEXISTS  = "hexists"
-	RDS_HSET     = "hset"
-	RDS_HGET     = "hget"
-	RDS_HDEL     = "hdel"
-	RDS_HGETALL  = "hgetall"
-	RDS_HKEYS    = "hkeys"
-	RDS_EXISTS   = "exists"
-	RDS_GET      = "get"
-	RDS_SET      = "set"
-	RDS_ZADD     = "zadd"
-	RDS_ZREVRANK = "zrevrank"
-	RDS_ZCOUNT   = "zcount"
-	RDS_DEL      = "del"
-	RDS_SETEX    = "setex"
-	RDS_HLEN     = "hlen"
-	RDS_INCR     = "incr"
-	RDS_HINCRBY  = "hincrby"
 )
 
 /**
@@ -64,7 +35,7 @@ func InitRds() {
 				IdleTimeout: time.Duration(nacos.InitConfiguration.Redis.IdleTimeout) * time.Second,
 				Wait:        true,
 				Dial: func() (conn redis.Conn, e error) {
-					return redis.Dial(REDIS_DIAL_TCP, nacos.InitConfiguration.Redis.IpPort,
+					return redis.Dial(constants.REDIS_DIAL_TCP, nacos.InitConfiguration.Redis.IpPort,
 						redis.DialPassword(nacos.InitConfiguration.Redis.PassWord),
 						redis.DialDatabase(nacos.InitConfiguration.Redis.Database),
 						redis.DialConnectTimeout(time.Duration(nacos.InitConfiguration.Redis.ConnectTimeout)*time.Second),
@@ -82,7 +53,7 @@ func InitRds() {
 			IdleTimeout: time.Duration(nacos.InitConfiguration.Redis.IdleTimeout) * time.Second,
 			Wait:        true,
 			Dial: func() (conn redis.Conn, e error) {
-				return redis.Dial(REDIS_DIAL_TCP, nacos.InitConfiguration.Redis.IpPort,
+				return redis.Dial(constants.REDIS_DIAL_TCP, nacos.InitConfiguration.Redis.IpPort,
 					redis.DialDatabase(nacos.InitConfiguration.Redis.Database),
 					redis.DialConnectTimeout(time.Duration(nacos.InitConfiguration.Redis.ConnectTimeout)*time.Second),
 					redis.DialReadTimeout(time.Duration(nacos.InitConfiguration.Redis.ReadTimeout)*time.Second),
@@ -102,10 +73,10 @@ func checkConn() {
 	logs.Lg.Debug("Redis连接", logs.Desc("检验redis连接是否成功"))
 	rc := Get()
 	defer rc.Close()
-	if reply, err := rc.Do(RDS_PING); err != nil {
+	if reply, err := rc.Do(constants.RDS_PING); err != nil {
 		logs.Lg.SysError("Redis连接", err)
 		os.Exit(1)
-	} else if "PONG" != reply.(string) {
+	} else if constants.REDIS_PONG != reply.(string) {
 		logs.Lg.SysError("Redis连接", errors.New("redis connect failure"))
 		os.Exit(1)
 	} else {

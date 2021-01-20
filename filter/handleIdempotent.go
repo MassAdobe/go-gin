@@ -7,16 +7,13 @@ package filter
 
 import (
 	"errors"
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/errs"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/nacos"
 	"github.com/MassAdobe/go-gin/rds"
 	"github.com/gin-gonic/gin"
 	"github.com/gomodule/redigo/redis"
-)
-
-const (
-	RDS_IDEMPOTENT_HEADER_KEY = "idempotent" // 头中幂等token参数
 )
 
 /**
@@ -29,7 +26,7 @@ func ValidIdempotent() gin.HandlerFunc {
 		logs.Lg.SysDebug("中间件-幂等", c, logs.Desc("当前接口使用幂等"))
 		if len(nacos.InitConfiguration.Redis.IpPort) != 0 { // 保证幂等 必须存在redis接入
 			logs.Lg.SysDebug("中间件-幂等", c, logs.Desc("当前接口使用幂等，并接入redis"))
-			if key := c.GetHeader(RDS_IDEMPOTENT_HEADER_KEY); len(key) == 0 { // 头中不存在token
+			if key := c.GetHeader(constants.RDS_IDEMPOTENT_HEADER_KEY); len(key) == 0 { // 头中不存在token
 				c.Abort()
 				logs.Lg.SysError("中间件-幂等", errors.New("header has no token error"), c, logs.Desc("头中不存在相关幂等token"))
 				panic(errs.NewError(errs.ErrValidIdempotentHeaderCode))
@@ -39,7 +36,7 @@ func ValidIdempotent() gin.HandlerFunc {
 				logs.Lg.SysDebug("中间件-幂等", c, logs.Desc("获取redis连接"))
 				defer conn.Close()
 				// 查询是否存在相关token
-				if rply, err := redis.Int(conn.Do(rds.RDS_DEL, key)); err != nil {
+				if rply, err := redis.Int(conn.Do(constants.RDS_DEL, key)); err != nil {
 					c.Abort()
 					logs.Lg.SysError("中间件-幂等", err, c, logs.Desc("redis错误"))
 					panic(errs.NewError(errs.ErrValidIdempotentCode))

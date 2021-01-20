@@ -7,6 +7,7 @@ package routin
 
 import (
 	"fmt"
+	"github.com/MassAdobe/go-gin/constants"
 	"runtime"
 	"strconv"
 	"strings"
@@ -20,7 +21,7 @@ import (
 func GoID() int {
 	var buf [64]byte
 	n := runtime.Stack(buf[:], false)
-	idField := strings.Fields(strings.TrimPrefix(string(buf[:n]), "goroutine "))[0]
+	idField := strings.Fields(strings.TrimPrefix(string(buf[:n]), constants.GO_ROUTINE_MARK))[0]
 	id, err := strconv.Atoi(idField)
 	if err != nil {
 		panic(fmt.Sprintf("cannot get goroutine id: %v", err))

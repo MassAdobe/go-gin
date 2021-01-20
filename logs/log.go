@@ -36,31 +36,12 @@ type MyLog struct {
 
 /**
  * @Author: MassAdobe
- * @TIME: 2020-04-26 20:02
- * @Description: 日志常量
-**/
-const (
-	TIME              = "time"
-	LOG_LEVEL         = "log_level"
-	LOGGER            = "logger"
-	DESC              = "desc"
-	MSG               = "msg"
-	TRACE             = "trace"
-	ERROR             = "error"
-	TIME_FORMAT       = "2006-01-02 15:04:05.000"
-	ZAP_FIELD_TYPE    = "zapcore.Field"
-	GIN_CONTEXT_TYPE  = "*gin.Context"
-	GIN_CONTEXT_TYPES = "[]*gin.Context"
-)
-
-/**
- * @Author: MassAdobe
  * @TIME: 2020-04-26 21:03
  * @Description: 新建日志
 **/
 func NewLogger(filePath, level string, maxSize, maxBackups, maxAge int, compress bool, serviceName string) {
 	core := newCore(filePath, level, maxSize, maxBackups, maxAge, compress)
-	Lg.ZapLog = zap.New(core, zap.AddCaller(), zap.Development(), zap.Fields(zap.String("server_name", serviceName)))
+	Lg.ZapLog = zap.New(core, zap.AddCaller(), zap.Development(), zap.Fields(zap.String(constants.LOG_SERVER_NAME_MARK, serviceName)))
 	zap.ReplaceGlobals(Lg.ZapLog)
 	Lg.Info("日志启动成功")
 }
@@ -82,13 +63,13 @@ func newCore(filePath, level string, maxSize, maxBackups, maxAge int, compress b
 	// 设置日志级别
 	Lg.Level = zap.NewAtomicLevel()
 	switch level {
-	case "debug":
+	case constants.LOG_LEVEL_DEBUG:
 		Lg.Level.SetLevel(zap.DebugLevel)
 		break
-	case "info":
+	case constants.LOG_LEVEL_INFO:
 		Lg.Level.SetLevel(zap.InfoLevel)
 		break
-	case "error":
+	case constants.LOG_LEVEL_ERROR:
 		Lg.Level.SetLevel(zap.ErrorLevel)
 		break
 	default:
@@ -97,11 +78,11 @@ func newCore(filePath, level string, maxSize, maxBackups, maxAge int, compress b
 	}
 	//公用编码器
 	encoderConfig := zapcore.EncoderConfig{
-		TimeKey:        TIME,
-		LevelKey:       LOG_LEVEL,
-		NameKey:        LOGGER,
-		MessageKey:     MSG,
-		StacktraceKey:  TRACE,
+		TimeKey:        constants.TIME,
+		LevelKey:       constants.LOG_LEVEL,
+		NameKey:        constants.LOGGER,
+		MessageKey:     constants.MSG,
+		StacktraceKey:  constants.TRACE,
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.CapitalLevelEncoder,    // 颜色编码器
 		EncodeTime:     myTimeEncode,                   // ISO8601 UTC 时间格式
@@ -122,7 +103,7 @@ func newCore(filePath, level string, maxSize, maxBackups, maxAge int, compress b
  * @Description: 标准化日志日期
 **/
 func myTimeEncode(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-	enc.AppendString(t.Format(TIME_FORMAT))
+	enc.AppendString(t.Format(constants.TIME_FORMAT))
 }
 
 /**
@@ -131,7 +112,7 @@ func myTimeEncode(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
  * @Description: 全局处理错误封装
 **/
 func BasicError(err interface{}) zap.Field {
-	return zap.Any(ERROR, err)
+	return zap.Any(constants.ERROR, err)
 }
 
 /**
@@ -141,9 +122,9 @@ func BasicError(err interface{}) zap.Field {
 **/
 func Error(err error) zap.Field {
 	if nil == err {
-		return zap.String(ERROR, "")
+		return zap.String(constants.ERROR, "")
 	}
-	return zap.String(ERROR, err.Error())
+	return zap.String(constants.ERROR, err.Error())
 }
 
 /**
@@ -152,7 +133,7 @@ func Error(err error) zap.Field {
  * @Description: 描述封装
 **/
 func Desc(desc interface{}) zap.Field {
-	return zap.Any(DESC, desc)
+	return zap.Any(constants.DESC, desc)
 }
 
 /**
@@ -210,8 +191,8 @@ func (this *MyLog) Debug(msg string, contextAndFields ...interface{}) {
 	fields := this.setTraceAndStep(contextAndFields...)
 	pc, file, line, _ := runtime.Caller(1)
 	f := runtime.FuncForPC(pc)
-	fields = append(fields, zap.Any("function", f.Name()))
-	fields = append(fields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
+	fields = append(fields, zap.Any(constants.FUNCTION_MARK, f.Name()))
+	fields = append(fields, zap.Any(constants.PATH_NUM_MARK, fmt.Sprintf("%s:%d", file, line)))
 	if ce := this.ZapLog.Check(zapcore.DebugLevel, msg); ce != nil {
 		ce.Write(fields...)
 	}
@@ -238,8 +219,8 @@ func (this *MyLog) Info(msg string, contextAndFields ...interface{}) {
 	fields := this.setTraceAndStep(contextAndFields...)
 	pc, file, line, _ := runtime.Caller(1)
 	f := runtime.FuncForPC(pc)
-	fields = append(fields, zap.Any("function", f.Name()))
-	fields = append(fields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
+	fields = append(fields, zap.Any(constants.FUNCTION_MARK, f.Name()))
+	fields = append(fields, zap.Any(constants.PATH_NUM_MARK, fmt.Sprintf("%s:%d", file, line)))
 	if ce := this.ZapLog.Check(zapcore.InfoLevel, msg); ce != nil {
 		ce.Write(fields...)
 	}
@@ -267,8 +248,8 @@ func (this *MyLog) Error(msg string, err error, contextAndFields ...interface{})
 	pc, file, line, _ := runtime.Caller(1)
 	f := runtime.FuncForPC(pc)
 	fields = append(fields, Error(err))
-	fields = append(fields, zap.Any("function", f.Name()))
-	fields = append(fields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
+	fields = append(fields, zap.Any(constants.FUNCTION_MARK, f.Name()))
+	fields = append(fields, zap.Any(constants.PATH_NUM_MARK, fmt.Sprintf("%s:%d", file, line)))
 	if ce := this.ZapLog.Check(zapcore.ErrorLevel, msg); ce != nil {
 		ce.Write(fields...)
 	}
@@ -297,7 +278,7 @@ func (this *MyLog) setTraceAndStep(contextAndFields ...interface{}) []zap.Field 
 	for _, contextAndField := range contextAndFields {
 		t := reflect.TypeOf(contextAndField)
 		switch t.String() {
-		case GIN_CONTEXT_TYPE:
+		case constants.GIN_CONTEXT_TYPE:
 			context := contextAndField.(*gin.Context)
 			if value, has := context.Params.Get(constants.REQUEST_TRACE_ID); has {
 				newFields = append(newFields, zap.Any(constants.REQUEST_TRACE_ID, value))
@@ -305,7 +286,7 @@ func (this *MyLog) setTraceAndStep(contextAndFields ...interface{}) []zap.Field 
 			if value, has := context.Params.Get(constants.REQUEST_STEP_ID); has {
 				newFields = append(newFields, zap.Any(constants.REQUEST_STEP_ID, value))
 			}
-		case GIN_CONTEXT_TYPES:
+		case constants.GIN_CONTEXT_TYPES:
 			context := contextAndField.([]*gin.Context)[0]
 			if value, has := context.Params.Get(constants.REQUEST_TRACE_ID); has {
 				newFields = append(newFields, zap.Any(constants.REQUEST_TRACE_ID, value))
@@ -313,7 +294,7 @@ func (this *MyLog) setTraceAndStep(contextAndFields ...interface{}) []zap.Field 
 			if value, has := context.Params.Get(constants.REQUEST_STEP_ID); has {
 				newFields = append(newFields, zap.Any(constants.REQUEST_STEP_ID, value))
 			}
-		case ZAP_FIELD_TYPE:
+		case constants.ZAP_FIELD_TYPE:
 			newFields = append(newFields, contextAndField.(zapcore.Field))
 		default:
 		}

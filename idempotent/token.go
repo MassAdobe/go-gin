@@ -6,14 +6,11 @@
 package idempotent
 
 import (
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/errs"
 	"github.com/MassAdobe/go-gin/goContext"
 	"github.com/MassAdobe/go-gin/rds"
 	"github.com/MassAdobe/go-gin/systemUtils"
-)
-
-const (
-	TOKEN_EXPIRE_TIME = 3600 // 幂等token有效时间(s)
 )
 
 /**
@@ -26,7 +23,7 @@ func GetToken(c *goContext.Context) {
 	// 获取redis连接
 	conn := rds.Get()
 	defer conn.Close()
-	if _, err := conn.Do(rds.RDS_SETEX, token, TOKEN_EXPIRE_TIME, ""); err != nil {
+	if _, err := conn.Do(constants.RDS_SETEX, token, constants.TOKEN_EXPIRE_TIME, ""); err != nil {
 		c.Error("幂等获取token", err)
 		panic(errs.NewError(errs.ErrGetIdempotentCode))
 	}

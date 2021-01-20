@@ -6,6 +6,7 @@
 package routers
 
 import (
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/errs"
 	"github.com/MassAdobe/go-gin/filter"
 	"github.com/MassAdobe/go-gin/goContext"
@@ -18,12 +19,6 @@ import (
 	"strings"
 )
 
-const (
-	ROUTER_RELEASE = "release" // 生产
-	ROUTER_TEST    = "test"    // 测试
-	ROUTER_DEBUG   = "debug"   // 开发
-)
-
 /**
  * @Author: MassAdobe
  * @TIME: 2021/1/6 10:05 上午
@@ -32,13 +27,13 @@ const (
 func NewRouter() (rtr *gin.Engine) {
 	logs.Lg.SysDebug("路由", logs.Desc("创建路由"))
 	switch strings.ToLower(pojo.InitConf.ProgramEnv) {
-	case ROUTER_RELEASE:
+	case constants.ROUTER_RELEASE:
 		logs.Lg.SysDebug("路由", logs.Desc("当前系统配置启动为生产环境"))
 		gin.SetMode(gin.ReleaseMode)
-	case ROUTER_TEST:
+	case constants.ROUTER_TEST:
 		logs.Lg.SysDebug("路由", logs.Desc("当前系统配置启动为测试环境"))
 		gin.SetMode(gin.TestMode)
-	case ROUTER_DEBUG:
+	case constants.ROUTER_DEBUG:
 		logs.Lg.SysDebug("路由", logs.Desc("当前系统配置启动为开发环境"))
 		gin.SetMode(gin.DebugMode)
 	default:

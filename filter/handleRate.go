@@ -7,6 +7,7 @@ package filter
 
 import (
 	"fmt"
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/nacos"
 	"github.com/gin-gonic/gin"
@@ -19,8 +20,8 @@ import (
 **/
 func RateLimit() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if _, okay := nacos.RateMap[nacos.RATE_ALL]; okay { // 如果存在全局
-			nacos.RateMap[nacos.RATE_ALL].Take()
+		if _, okay := nacos.RateMap[constants.RATE_ALL]; okay { // 如果存在全局
+			nacos.RateMap[constants.RATE_ALL].Take()
 			logs.Lg.SysDebug("中间件-限流", logs.Desc("命中全局限流"), c)
 		} else if _, okay := nacos.RateMap[c.Request.URL.Path]; okay { // 如果存在当前api
 			nacos.RateMap[c.Request.URL.Path].Take()

@@ -8,6 +8,7 @@ package nacos
 import (
 	"errors"
 	"fmt"
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/logs"
 	"github.com/MassAdobe/go-gin/pojo"
 	"github.com/MassAdobe/go-gin/systemUtils"
@@ -65,9 +66,9 @@ func InitNacos() {
 		for _, ip := range nacosIps {
 			serverCs = append(serverCs, constant.ServerConfig{
 				IpAddr:      ip,
-				ContextPath: "/nacos",
+				ContextPath: constants.NACOS_CONTEXT_PATH,
 				Port:        pojo.InitConf.NacosServerPort,
-				Scheme:      "http",
+				Scheme:      constants.NACOS_SCHEMA,
 			})
 		}
 		// 初始化nacos的client服务
@@ -77,12 +78,12 @@ func InitNacos() {
 		}
 		clientC = constant.ClientConfig{
 			NamespaceId:         pojo.InitConf.NacosClientNamespaceId, // 如果需要支持多namespace，我们可以场景多个client,它们有不同的NamespaceId
-			NotLoadCacheAtStart: true,
-			LogDir:              "/tmp/nacos/log",
-			CacheDir:            "/tmp/nacos/cache",
-			RotateTime:          "1h",
-			MaxAge:              3,
-			LogLevel:            "debug",
+			NotLoadCacheAtStart: constants.NACOS_NOT_LOAD_CACHE_AT_START,
+			LogDir:              constants.NACOS_LOG_DIR,
+			CacheDir:            constants.NACOS_LOG_CACHE_DIR,
+			RotateTime:          constants.NACOS_ROTATE_TIME,
+			MaxAge:              constants.NACOS_MAX_AGE,
+			LogLevel:            constants.NACOS_LOG_LEVEL,
 		}
 		if 0 == pojo.InitConf.NacosClientTimeoutMs {
 			fmt.Println(fmt.Sprintf(`{"log_level":"ERROR","time":"%s","msg":"%s","server_name":"%s","desc":"%s"}`, systemUtils.RtnCurTime(), "配置中心", "未知", "nacos请求Nacos服务端的超时时间为空，默认为10000ms"))
@@ -110,8 +111,8 @@ func NacosConfiguration() {
 		// 创建动态配置客户端
 		var configClientErr error
 		configClient, configClientErr = clients.CreateConfigClient(map[string]interface{}{
-			"serverConfigs": serverCs,
-			"clientConfig":  clientC,
+			constants.NACOS_SERVER_CONFIGS_MARK: serverCs,
+			constants.NACOS_CLIENT_CONFIG_MARK:  clientC,
 		})
 		if nil != configClientErr {
 			fmt.Println(fmt.Sprintf(`{"log_level":"ERROR","time":"%s","msg":"%s","server_name":"%s","desc":"%s"}`, systemUtils.RtnCurTime(), "配置中心", "未知", "nacos配置中心连接错误"))
@@ -148,25 +149,25 @@ func ListenConfiguration() {
 				if strings.ToLower(pojo.InitConf.LogLevel) != strings.ToLower(profile.Log.Level) {
 					logs.Lg.SysDebug("nacos配置文件监听", logs.Desc("日志级别修改"))
 					switch strings.ToLower(profile.Log.Level) {
-					case "debug":
+					case constants.LOG_LEVEL_MODIFIED_DEBUG:
 						logs.Lg.Level.SetLevel(zap.DebugLevel)
 						printModifiedLog(profile.Log.Level)
-					case "info":
+					case constants.LOG_LEVEL_MODIFIED_INFO:
 						logs.Lg.Level.SetLevel(zap.InfoLevel)
 						printModifiedLog(profile.Log.Level)
-					case "warn":
+					case constants.LOG_LEVEL_MODIFIED_WARN:
 						logs.Lg.Level.SetLevel(zap.WarnLevel)
 						printModifiedLog(profile.Log.Level)
-					case "error":
+					case constants.LOG_LEVEL_MODIFIED_ERROR:
 						logs.Lg.Level.SetLevel(zap.ErrorLevel)
 						printModifiedLog(profile.Log.Level)
-					case "dpanic":
+					case constants.LOG_LEVEL_MODIFIED_DPANIC:
 						logs.Lg.Level.SetLevel(zap.DPanicLevel)
 						printModifiedLog(profile.Log.Level)
-					case "panic":
+					case constants.LOG_LEVEL_MODIFIED_PANIC:
 						logs.Lg.Level.SetLevel(zap.PanicLevel)
 						printModifiedLog(profile.Log.Level)
-					case "fatal":
+					case constants.LOG_LEVEL_MODIFIED_FATAL:
 						logs.Lg.Level.SetLevel(zap.FatalLevel)
 						printModifiedLog(profile.Log.Level)
 					default:

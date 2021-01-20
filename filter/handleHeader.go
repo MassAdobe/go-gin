@@ -21,11 +21,6 @@ import (
 	"strings"
 )
 
-const (
-	HEADER_USER_JOSN  = `{"user_id": 1}` // 如果是开发环境，为了简化开发，默认给定user_id=1
-	PROGRAM_ENV_DEBUG = "debug"          // 开发环境
-)
-
 /**
  * @Author: MassAdobe
  * @TIME: 2020-04-27 21:49
@@ -33,7 +28,7 @@ const (
 **/
 func GetReqUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if strings.ToLower(pojo.InitConf.ProgramEnv) != PROGRAM_ENV_DEBUG { // 如果是开发环境
+		if strings.ToLower(pojo.InitConf.ProgramEnv) != constants.PROGRAM_ENV_DEBUG { // 如果是开发环境
 			logs.Lg.SysDebug("中间件-用户信息", c, logs.Desc("当前为非开发环境"))
 			if get := c.GetHeader(constants.REQUEST_USER_KEY); len(get) != 0 {
 				logs.Lg.SysDebug("中间件-用户信息", c, logs.Desc("头信息中包含用户信息"))
@@ -47,7 +42,7 @@ func GetReqUser() gin.HandlerFunc {
 			logs.Lg.SysDebug("中间件-用户信息", c, logs.Desc("当前为开发环境"))
 			if get := c.GetHeader(constants.REQUEST_USER_KEY); len(get) == 0 {
 				logs.Lg.SysDebug("中间件-用户信息", c, logs.Desc("当前开发环境包含头中用户信息"))
-				c.Header(constants.REQUEST_USER_KEY, HEADER_USER_JOSN)
+				c.Header(constants.REQUEST_USER_KEY, constants.HEADER_USER_JOSN)
 			} else {
 				logs.Lg.SysDebug("中间件-用户信息", c, logs.Desc("当前开发环境不包含头中用户信息"))
 			}

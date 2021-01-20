@@ -23,10 +23,6 @@ import (
 	"strings"
 )
 
-const (
-	GO_CONTEXT_ENV_DEBUG = "debug"
-)
-
 /**
  * @Author: MassAdobe
  * @TIME: 2021/1/7 5:29 下午
@@ -55,7 +51,7 @@ func Handle(handle HandlerFunc) gin.HandlerFunc {
 			c.Header(constants.TOKEN_KEY, c.Request.Header.Get(constants.TOKEN_KEY))
 			logs.Lg.SysDebug("中间件-超时", logs.Desc(fmt.Sprintf("获取到刷新的TOKEN: %s, 放入到返回体中", c.Request.Header.Get(constants.TOKEN_KEY))))
 		}
-		if strings.ToLower(pojo.InitConf.ProgramEnv) == GO_CONTEXT_ENV_DEBUG {
+		if strings.ToLower(pojo.InitConf.ProgramEnv) == constants.GO_CONTEXT_ENV_DEBUG {
 			logs.Lg.SysDebug("中间件-超时", c, "当前环境为开发环境，默认取消超时设置")
 			handle(&Context{c, &logs.Lg})
 		} else {
@@ -63,7 +59,7 @@ func Handle(handle HandlerFunc) gin.HandlerFunc {
 			timeout, cancel := context.WithTimeout(c.Request.Context(), constants.REQUEST_TIMEOUT_TM)
 			c.Request.WithContext(timeout)
 			finishChan := make(chan bool)
-			c.Set("finish", finishChan)
+			c.Set(constants.CONTEXT_STATUS_FINISH, finishChan)
 			logs.Lg.SysDebug("中间件-超时", c, "协程处理业务接口函数")
 			go handle(&Context{c, &logs.Lg})
 			select {
@@ -121,8 +117,8 @@ func (this *Context) Debug(msg string, fields ...zap.Field) {
 	}
 	pc, file, line, _ := runtime.Caller(1)
 	f := runtime.FuncForPC(pc)
-	newFields = append(newFields, zap.Any("function", f.Name()))
-	newFields = append(newFields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
+	newFields = append(newFields, zap.Any(constants.CONTEXT_LOG_FUNCTION_MARK, f.Name()))
+	newFields = append(newFields, zap.Any(constants.CONTEXT_LOG_PATH_NUM_MARK, fmt.Sprintf("%s:%d", file, line)))
 	if ce := this.GinLog.ZapLog.Check(zapcore.DebugLevel, msg); ce != nil {
 		ce.Write(newFields...)
 	}
@@ -155,8 +151,8 @@ func (this *Context) Info(msg string, fields ...zap.Field) {
 	}
 	pc, file, line, _ := runtime.Caller(1)
 	f := runtime.FuncForPC(pc)
-	newFields = append(newFields, zap.Any("function", f.Name()))
-	newFields = append(newFields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
+	newFields = append(newFields, zap.Any(constants.CONTEXT_LOG_FUNCTION_MARK, f.Name()))
+	newFields = append(newFields, zap.Any(constants.CONTEXT_LOG_PATH_NUM_MARK, fmt.Sprintf("%s:%d", file, line)))
 	if ce := this.GinLog.ZapLog.Check(zapcore.InfoLevel, msg); ce != nil {
 		ce.Write(newFields...)
 	}
@@ -189,8 +185,8 @@ func (this *Context) Warn(msg string, fields ...zap.Field) {
 	}
 	pc, file, line, _ := runtime.Caller(1)
 	f := runtime.FuncForPC(pc)
-	newFields = append(newFields, zap.Any("function", f.Name()))
-	newFields = append(newFields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
+	newFields = append(newFields, zap.Any(constants.CONTEXT_LOG_FUNCTION_MARK, f.Name()))
+	newFields = append(newFields, zap.Any(constants.CONTEXT_LOG_PATH_NUM_MARK, fmt.Sprintf("%s:%d", file, line)))
 	if ce := this.GinLog.ZapLog.Check(zapcore.WarnLevel, msg); ce != nil {
 		ce.Write(newFields...)
 	}
@@ -209,8 +205,8 @@ func (this *Context) Error(msg string, err error, fields ...zap.Field) {
 	pc, file, line, _ := runtime.Caller(1)
 	f := runtime.FuncForPC(pc)
 	newFields = append(newFields, logs.Error(err))
-	newFields = append(newFields, zap.Any("function", f.Name()))
-	newFields = append(newFields, zap.Any("path_num", fmt.Sprintf("%s:%d", file, line)))
+	newFields = append(newFields, zap.Any(constants.CONTEXT_LOG_FUNCTION_MARK, f.Name()))
+	newFields = append(newFields, zap.Any(constants.CONTEXT_LOG_PATH_NUM_MARK, fmt.Sprintf("%s:%d", file, line)))
 	if ce := this.GinLog.ZapLog.Check(zapcore.ErrorLevel, msg); ce != nil {
 		ce.Write(newFields...)
 	}
@@ -287,7 +283,7 @@ func (this *Context) SuccRes(data interface{}) {
 		logs.SpecDesc("请求路径", this.GinContext.Request.URL),
 		logs.SpecDesc("响应体", data))
 	this.GinContext.JSON(http.StatusOK, res(errs.SuccessCode, data))
-	if finish, exists := this.GinContext.Get("finish"); exists {
+	if finish, exists := this.GinContext.Get(constants.CONTEXT_STATUS_FINISH); exists {
 		finish.(chan bool) <- true
 		this.Debug("成功返回", logs.Desc("当前接口正常结束，发送正常结束信号"))
 	}
@@ -307,7 +303,7 @@ func (this *Context) FailRes(errCode int, data interface{}) {
 		logs.SpecDesc("请求路径", this.GinContext.Request.URL),
 		logs.SpecDesc("响应体", data))
 	this.GinContext.JSON(http.StatusOK, res(errCode, data))
-	if finish, exists := this.GinContext.Get("finish"); this.GinContext.IsAborted() && exists {
+	if finish, exists := this.GinContext.Get(constants.CONTEXT_STATUS_FINISH); this.GinContext.IsAborted() && exists {
 		finish.(chan bool) <- true
 		this.Debug("错误返回", logs.Desc("当前接口正常结束，发送正常结束信号"))
 	}
@@ -327,7 +323,7 @@ func (this *Context) SuccResFeign(data interface{}) {
 		logs.SpecDesc("请求路径", this.GinContext.Request.URL),
 		logs.SpecDesc("响应体", data))
 	this.GinContext.JSON(http.StatusOK, data)
-	if finish, exists := this.GinContext.Get("finish"); this.GinContext.IsAborted() && exists {
+	if finish, exists := this.GinContext.Get(constants.CONTEXT_STATUS_FINISH); this.GinContext.IsAborted() && exists {
 		finish.(chan bool) <- true
 		this.Debug("内部调用成功返回", logs.Desc("当前接口正常结束，发送正常结束信号"))
 	}

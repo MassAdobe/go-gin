@@ -8,6 +8,7 @@ package start
 import (
 	"context"
 	"fmt"
+	"github.com/MassAdobe/go-gin/constants"
 	"github.com/MassAdobe/go-gin/db"
 	ginHttp "github.com/MassAdobe/go-gin/http"
 	"github.com/MassAdobe/go-gin/logs"
@@ -32,8 +33,8 @@ import (
 **/
 func init() {
 	fmt.Println(fmt.Sprintf(`{"log_level":"INFO","time":"%s","msg":"%s","server_name":"%s","desc":"%s"}`, systemUtils.RtnCurTime(), "启动", "未知", "启动中"))
-	s, _ := systemUtils.RunInLinuxWithErr("pwd")     // 执行linux命令获取当前路径
-	sysData, _ := ioutil.ReadFile(s + "/config.yml") // 读取系统配置
+	s, _ := systemUtils.RunInLinuxWithErr(constants.SYSTEM_CONTROL_PWD) // 执行linux命令获取当前路径
+	sysData, _ := ioutil.ReadFile(s + constants.CONFIG_NAME)            // 读取系统配置
 	if err := yaml.Unmarshal(sysData, &pojo.InitConf); err != nil {
 		fmt.Println(fmt.Sprintf(`{"log_level":"INFO","time":"%s","msg":"%s","server_name":"%s","desc":"%s"}`, systemUtils.RtnCurTime(), "启动", "未知", "解析系统配置失败"))
 		os.Exit(1)
